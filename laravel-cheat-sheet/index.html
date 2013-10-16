@@ -1,0 +1,768 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Laravel Cheat Sheet - Alex's Blog</title>
+  <meta name="author" content="Alex Russell">
+
+  
+  <meta name="description" content="Laravel Cheat Sheet IoC Usage In general, where these methods take closures, the closure will act as they should. For example, App::singleton()& &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://alexrussell.me.uk/laravel-cheat-sheet">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Alex's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Alex's Blog</a></h1>
+  
+    <h2>The blog of Alex</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:alexrussell.me.uk" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article role="article">
+  
+  <header>
+    <h1 class="entry-title">Laravel Cheat Sheet</h1>
+    
+  </header>
+  
+  <h2>IoC Usage</h2>
+
+<p>In general, where these methods take closures, the closure will act as they should. For example, <code>App::singleton()</code>&rsquo;s closure is immediately invoked to get the instance to be used every time make is called.</p>
+
+<h3>Quick intro:</h3>
+
+<ul>
+<li><p><code>bind($abstract, $concrete, $shared)</code></p>
+
+<p>  Adds <code>$abstract</code> as a key to the container, with <code>$concrete</code> being the concrete class to instantiate in its place.
+  Mainly used for providing a concrete implementation for an interface.</p></li>
+<li><p><code>singleton($abstract, $concrete)</code></p>
+
+<p>  Simply an alias to <code>make</code> with the <code>$shared</code> argument set to true.
+  Mainly used for providing a concrete implementation for an interface, but one that should only have one instance (database connection, etc.).</p></li>
+<li><p><code>share($closure)</code></p>
+
+<p>  Given a closure (only), makes it act as if it was shared (instance/singleton style), and returns it.
+  Technically equivalent to <code>App::bind($key, $closure, true)</code> but goes about it a different way.
+  Mainly used in service providers to add a fully resolvable service to the IoC container.</p></li>
+<li><p><code>extend($abstract, $closure)</code></p>
+
+<p>  Allows you to wrap an existing binding with another closure.</p></li>
+<li><p><code>instance($abstract, $instance)</code></p>
+
+<p>  Kinda bypasses the IoC bindings and passes the <code>$instance</code> directly into <code>$app-&gt;instances</code>.
+  Good for mocking, as it&rsquo;ll tell Laravel which instance to give to a class that asks for an abstract.</p></li>
+<li><p><code>alias($abstract, $alias)</code></p>
+
+<p>  Allows you to alias a fully-qualified type to a shorter version for later usage in <code>make</code>.</p></li>
+<li><p><code>make($abstract[, $parameters = array()])</code></p>
+
+<p>  Retrieves the binding from the IoC container and returns an instance of the class that is required.</p></li>
+<li><p><code>build($concrete[, $parameters = array()])</code></p>
+
+<p>  While this is public, it appears that the general idea is not to call this. It is called internally by <code>make</code> to resolve a standard class&rsquo;s dependencies.</p></li>
+<li><p>array access</p>
+
+<p>  Upon getting, internally App::make is called on the key passed in.
+  Upon setting, internally App::bind is called, an the value passed in is converted to a closure if it is not already one</p></li>
+</ul>
+
+
+<h3>bind</h3>
+
+<p><code>App::bind($abstract, $concrete, $shared)</code></p>
+
+<p>Given a class abstract pathspec (i.e. the fully-qualified path to an interface), when <code>make</code> is called on that pathspec, return the given concrete implementation (if <code>$concrete</code> is a string, it&rsquo;s a fully-qualified path to a concrete class to be instantiated in <code>$abstract</code>&rsquo;s place, if a closure, then execute and return the return value of the closure.</p>
+
+<p>If <code>$shared</code> is <code>false</code> (default), the closure is executed every time <code>make</code> is called. If <code>$shared</code> is <code>true</code>, the closure is executed once (lazily on first call to <code>make</code>) and its return value will be cached to return for subsequent <code>make</code> calls.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">interface</span> <span class="nx">BlahInterface</span> <span class="p">{}</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">ConcreteBlah</span> <span class="k">implements</span> <span class="nx">BlahInterface</span> <span class="p">{}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">App</span><span class="o">::</span><span class="na">bind</span><span class="p">(</span><span class="s1">&#39;BlahInterface&#39;</span><span class="p">,</span> <span class="s1">&#39;ConcreteBlah&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">SomeController</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">public</span> <span class="nx">__construct</span><span class="p">(</span><span class="nx">BlahInterface</span> <span class="nv">$blah</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="c1">// $blah is an instance of ConcreteBlah</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>singleton</h3>
+
+<p><code>App::singleton($abstract, $concrete)</code></p>
+
+<p>In effect this adds <code>$abstract</code> as a key to the container with the value of <code>$concrete</code> and because <code>$shared</code> is set to true, the first time it&rsquo;s instantiated the object goes into <code>$app-&gt;instances</code> so that the next time <code>make</code> is called, the instance is used rather than being re-instantiated.</p>
+
+<p>If <code>$concrete</code> is a closure, it is evaluated lazily when the first instance is requested with <code>make</code> and then stored in <code>$app-&gt;instances</code> for future reference.</p>
+
+<h3>share</h3>
+
+<p><code>App::share($closure)</code></p>
+
+<p>It does this by wrapping it in a new closure that, the first time it runs, runs the closure and stores the result in a temporary variable. Every time it&rsquo;s called after that, it just returns the result.</p>
+
+<p>Share doesn&rsquo;t store anything in the IoC container, and just returns a closure. Make sure you use it with another IoC feature (most people go for <code>$app['my.feature'] = $app-&gt;share(/* closure */)</code>).</p>
+
+<h3>extend</h3>
+
+<p><code>App::extend($abstract, $closure)</code></p>
+
+<p>Extend a binding with an outer wrapping closure. When the binding is resolved using <code>make</code>, the original closure is executed and then its result (the instance) is passed into the closure that was passed in here.</p>
+
+<p>Presumably this could be used for overriding dependency injection or setting additional dependencies using <code>$model-&gt;setInterface($concrete)</code> kinda thing.</p>
+
+<h3>instance</h3>
+
+<p><code>App::instance($abstract, $instance)</code></p>
+
+<p>Sharing through <code>bind</code> and the other sharing methods will eventually achieve the same thing, but doing this is a shortcut to the desired endpoint: the instance you need is in <code>$app-&gt;instances</code>. Use this when you have an instance ready to go, or the other methods if you are using string classnames or closures.</p>
+
+<p><code>$instance</code> should <strong>not</strong> be a closure as it is returned as-is in <code>make</code>.</p>
+
+<p>The use-case for instance, from the look of it, is that when asked (through type hinting usually) for an instance of <code>Class</code>, return <code>$instance</code>. Good for mocking Eloquent models:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$mock</span> <span class="o">=</span> <span class="nx">m</span><span class="o">::</span><span class="na">mock</span><span class="p">(</span><span class="s1">&#39;Post&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="o">-&gt;</span><span class="na">instance</span><span class="p">(</span><span class="s1">&#39;Post&#39;</span><span class="p">,</span> <span class="nv">$mock</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">SomeController</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">Post</span> <span class="nv">$post</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="c1">// $post is now the mocked version of the real Post class</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>alias</h3>
+
+<p><code>App::alias($abstract, $alias)</code></p>
+
+<p>Allows you to alias a fully-qualified type to a shorter version. So you can alias <code>\My\Namespace\Is\Deep\MyClass</code> to <code>MyClass</code> by calling <code>App::alias('\My\Namespace\Is\Deep\MyClass', 'MyClass');</code> and then later you can just call <code>App::make('MyClass');</code></p>
+
+<p>This function does not actually store any bindings &ndash; just the fact that something called <code>$abstract</code> in the IoC container can be found by asking for <code>$alias</code>. It&rsquo;s also naïve in that you can pass anything in and it does no checking. Presumably the eventual call to <code>make</code> will do the checking that something <em>can</em> be resolved.</p>
+
+<h3>make</h3>
+
+<p><code>App::make($abstract[, $parameters = array()])</code></p>
+
+<p>Get the instance of Class that you know about. If you don&rsquo;t have one registered (either with <code>App::instance()</code>, <code>App:share()</code> or <code>App:singleton()</code>, etc.) then try to just resolve the class the best way you know how (i.e. instantiate and use reflection to also try to resolve its dependencies).</p>
+
+<p>This could go all sorts of ways depending on how the binding is set up, but basically:</p>
+
+<ol>
+<li>the alias is resolved if there is one</li>
+<li>if there&rsquo;s already an instance stored in <code>$app-&gt;instances</code> that&rsquo;ll be returned, if not, continue</li>
+<li>get the concrete version of the given abstract &lt;&mdash; QUALIFY</li>
+<li>if the concrete is buildable (QUALIFY) then <code>build</code> it, otherwise <code>make</code> it to get the actual instance to be used</li>
+<li>if it&rsquo;s set to be shared, put the instance in <code>$app-&gt;instances</code> so next time we stop at 2.</li>
+<li>fire callbacks, passing in the instance</li>
+<li>return the instance</li>
+</ol>
+
+
+<p>This appears to be the backbone of the IoC – at a guess, whenever Laravel needs to resolve anything (through either an explicit call to <code>App::make()</code> or typehints) it&rsquo;ll use this. In turn, this uses the various registration methods outlined above.</p>
+
+<h2>URL Generation</h2>
+
+<h3><code>URL::current()</code></h3>
+
+<p>Returns the full URL of the current request, e.g. <code>http://localhost/path/to/page</code></p>
+
+<h3><code>URL::full()</code></h3>
+
+<p>Returns the full URL of the current request with querystring appended, e.g. <code>http://localhost/path/to/page?foo=bar</code></p>
+
+<h3><code>URL::previous()</code></h3>
+
+<p>Returns the full URL of the previous request (useful when redirecting maybe) &ndash; simply uses the value from the HTTP &lsquo;referer&rsquo; header, so <em>should</em> include the querystring</p>
+
+<h3><code>URL::to($uri[, $parameters = array(), $secure = false])</code></h3>
+
+<p>Generates a full URL to the given URI path after the domain part. Does no checking of the validity of the URI passed.</p>
+
+<h3><code>URL::secure($uri[, $parameters = array(), $secure = false])</code></h3>
+
+<p>Like <code>URL::to()</code> but generates HTTPS links</p>
+
+<h3><code>URL::route($route_name[, $parameters = array(), $secure = false])</code></h3>
+
+<p>Like <code>URL::to()</code> but pass in the name of a named route and it&rsquo;ll give the associated URI</p>
+
+<h3><code>URL::action($action[, $parameters = array(), $secure = false])</code></h3>
+
+<p>Like <code>URL::route()</code> but instead of passing in a named route, pass in a controller-action combination, e.g. <code>Controller@action</code></p>
+
+<h3><code>URL::asset($uri[, $secure = false])</code></h3>
+
+<p>Looks like it works just like <code>URL::to()</code> in that is appends the passed URI to the full URL to the framework document root.</p>
+
+<h3><code>URL::secureAsset($uri)</code></h3>
+
+<p>Like <code>URL::asset()</code> but generates HTTPS links</p>
+
+<h3><code>url($uri[, $parameters = array(), $secure = false])</code></h3>
+
+<p>Alias of <code>URL::to()</code></p>
+
+<h3><code>secure_url($uri[, $parameters = array(), $secure = false])</code></h3>
+
+<p>Alias of <code>URL::secure()</code></p>
+
+<h3><code>route($route_name[, $parameters = array(), $secure = false])</code></h3>
+
+<p>Alias of <code>URL::route()</code></p>
+
+<h3><code>action($action[, $parameters = array(), $secure = false])</code></h3>
+
+<p>Alias of <code>URL::action()</code></p>
+
+<h3><code>asset($uri[, $secure=false])</code></h3>
+
+<p>Alias of <code>URL::asset()</code></p>
+
+<h3><code>secure_asset($uri)</code></h3>
+
+<p>Alias of <code>URL::secureAsset()</code></p>
+
+<h3><code>link_to($uri, $title[, $attributes = array(), $secure = false])</code></h3>
+
+<p>Generates an HTML anchor tag to the given URI (see <code>URL::to()</code>)</p>
+
+<h3><code>link_to_asset($uri, $title[, $attributes = array(), $secure = false])</code></h3>
+
+<p>Generates an HTML anchor tag to the given asset URI (see <code>URL::asset()</code>)</p>
+
+<h3><code>link_to_route($route_name, $title[, $parameters = array(), $attributes = array()])</code></h3>
+
+<p>Generates an HTML anchor linking to the named route (see <code>URL::route()</code>)</p>
+
+<h3><code>link_to_action($action, $title[, $parameters = array(), $attributes = array()])</code></h3>
+
+<p>Generates an HTML anchor linking to the action (see <code>URL::action()</code>)</p>
+
+<h2>Service Providers</h2>
+
+<p>The <code>register</code> method of a service provider is called first. This method should do very little – simply add any bindings to the IoC container. The reason being that all service providers will be initialised (using <code>register</code>) in order, so a given service provider cannot guarantee that a service provider it may rely on is initialised yet, and thus cannot use it.</p>
+
+<p>The next method that&rsquo;s called is <code>boot</code>. By the time this method fires, all of the service providers should be initialised, so things like <code>Route::get()</code> and <code>Queue::push()</code> can be used. Do the &lsquo;proper&rsquo; initialisation of a service provider (such as adding routes and generally using other service providers) here.</p>
+
+<h3>Packages</h3>
+
+<p>There are various parts of putting together a package and its (main) service provider that aren&rsquo;t discussed very well in the documentation:</p>
+
+<ul>
+<li><p><code>$this-&gt;package('vendor/package' [, $namespace = null, $path = null])</code></p>
+
+<p>  This sets up a package so that Laravel knows where to look for the config, views, etc. In general, just passing the vendor/package name to the call to <code>package</code> will suffice, but if your paths are non-standard or you want to use a specific view/config namespace, you can set them up here.</p></li>
+<li><p><code>$this-&gt;commands(array)</code></p>
+
+<p>  This registers with Artisan the commands specified in the passed array (which should already be registered in the IoC container). The strings in the array should be the IoC keys you set up.
+  This is pretty much a shortcut (due to common use-case) to calling <code>Artisan::resolve('ioc_binding_name')</code>, which is itself a shortcut of sorts to <code>Artisan::add($command_instance)</code>.</p></li>
+<li><p><code>protected $defer = false</code></p>
+
+<p>  This service provider attribute allows Laravel to know whether your service provider&rsquo;s loading can be deferred or not. Defaults to false, but set to true if you do a lot of bootstrapping maybe?</p></li>
+<li><p><code>function provides() ⟶ array</code></p>
+
+<p>  Laravel calls this function to learn what services the service provider actually provides to the IoC container (before it actually does so). This is meant to be used in combination with the <code>$defer</code> attribute so that, for deferred service providers, the first time a provider specified in this array is used, Laravel can lazily register and boot the correct service provider.</p></li>
+</ul>
+
+
+<p>Also not discussed in the documentation is that a package&rsquo;s views can be overridden like its config can. To override the config, <code>artisan config:publish vendor/package</code> can be called, which under the hood copies the package&rsquo;s <code>&lt;package_root&gt;/config/*</code> files to <code>app/config/packages/&lt;vendor&gt;/&lt;package&gt;/*</code>. There is now (<a href="https://github.com/laravel/framework/pull/2364">all thanks to me</a>) also a corresponding <code>artisan</code> command for publishing views: just use <code>artisan view:publish vendor/package</code>. <strong>Do be careful with this though!</strong></p>
+
+<h2>Eloquent Models</h2>
+
+<h3>Relationships</h3>
+
+<p>A default belongsToMany relationship will look for the table references by concatenating the two tables in question, both singular and listed in alphabetical order, with an underscore in between.</p>
+
+<p>So <code>users</code> and <code>tags</code> are joined through <code>tag_user</code>.</p>
+
+<h4>Using relationships</h4>
+
+<p>In the following code:</p>
+
+<ul>
+<li><code>Post</code> hasMany <code>Comment</code></li>
+<li><code>Comment</code> belongsTo <code>Post</code></li>
+<li><code>Post</code> belongsToMany <code>Tag</code></li>
+<li><code>Tag</code> belongsToMany <code>Post</code></li>
+</ul>
+
+
+<p>To get the collection associated with a <code>hasMany</code> or <code>belongsToMany</code>, or the model associated with a <code>belongsTo</code>, the relationship field can be used directly from the model:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$post</span> <span class="o">=</span> <span class="nx">Post</span><span class="o">::</span><span class="na">findById</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$comments</span> <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">comments</span><span class="p">;</span> <span class="c1">// plural as it&#39;s a hasMany - but not `$post-&gt;comments()`</span>
+</span><span class='line'><span class="c1">// $comments can now be iterated through</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$comment</span> <span class="o">=</span> <span class="nx">Comment</span><span class="o">::</span><span class="na">findById</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$post</span> <span class="o">=</span> <span class="nv">$comment</span><span class="o">-&gt;</span><span class="na">post</span><span class="p">;</span> <span class="c1">// singular as it&#39;s a belongsTo - but not `$comment-&gt;post()`</span>
+</span><span class='line'><span class="c1">// $post is an instance of Post</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In the case of altering the relationships (or working on the pivot table in a <code>belongsToMany</code> relationship), the set must be retrieved by calling the relationship as a function.</p>
+
+<p>For <code>hasMany</code> and <code>belongsTo</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$post</span>          <span class="o">=</span> <span class="nx">Post</span><span class="o">::</span><span class="na">findById</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$comment</span>       <span class="o">=</span> <span class="nx">Comment</span><span class="o">::</span><span class="na">findById</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$other_comment</span> <span class="o">=</span> <span class="nx">Comment</span><span class="o">::</span><span class="na">findById</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// add to a hasMany set</span>
+</span><span class='line'><span class="nv">$post</span><span class="o">-&gt;</span><span class="na">comments</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">(</span><span class="nv">$comment</span><span class="p">);</span> <span class="c1">// both are models</span>
+</span><span class='line'><span class="nv">$post</span><span class="o">-&gt;</span><span class="na">comments</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">saveMany</span><span class="p">([</span><span class="nv">$comment</span><span class="p">,</span> <span class="nv">$other_comment</span><span class="p">]);</span> <span class="c1">// all are models</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// can also use create/createMany to create and associate at the same time</span>
+</span><span class='line'><span class="nv">$post</span><span class="o">-&gt;</span><span class="na">comments</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">([</span><span class="s1">&#39;title&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Some Comment&#39;</span><span class="p">]);</span>
+</span><span class='line'><span class="nv">$post</span><span class="o">-&gt;</span><span class="na">comments</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">createMany</span><span class="p">([[</span><span class="s1">&#39;title&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Some Comment&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;title&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Some Other Comment&#39;</span><span class="p">]]);</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// associate parent in belongsTo</span>
+</span><span class='line'><span class="nv">$comment</span> <span class="o">=</span> <span class="nx">Comment</span><span class="o">::</span><span class="na">findById</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$post</span>    <span class="o">=</span> <span class="nx">Post</span><span class="o">::</span><span class="na">findById</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$comment</span><span class="o">-&gt;</span><span class="na">post</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">associate</span><span class="p">(</span><span class="nv">$post</span><span class="p">);</span> <span class="c1">// both are models</span>
+</span><span class='line'><span class="nv">$comment</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span> <span class="c1">// must save after association (presumably because it&#39;s a field on the table)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As far as I can tell, there is no way to remove a model from a <code>hasMany</code> set or remove the relation in a <code>belongsTo</code>. Calling <code>$comment-&gt;post()-&gt;associate()</code> will not work to set the relation to <code>NULL</code> and effectively sever the relationship as the <code>associate</code> method expects an <code>Eloquent\Model</code> instance. Similarly, there is no way to set a whole hasMany set in one go &ndash; <code>saveMany</code> will add multiple associations, but will not remove any one not passed in.</p>
+
+<p>For <code>belongsToMany</code> (note how the functions use IDs, not models*):</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$post</span> <span class="o">=</span> <span class="nx">Post</span><span class="o">::</span><span class="na">findById</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$tag</span>  <span class="o">=</span> <span class="nx">Tag</span><span class="o">::</span><span class="na">findById</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// add tag to post</span>
+</span><span class='line'><span class="nv">$post</span><span class="o">-&gt;</span><span class="na">tags</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="nv">$tag</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">);</span> <span class="c1">// uses the tag&#39;s ID - also this code is probably better written as `$tag-&gt;getKey()`</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// remove tag from post</span>
+</span><span class='line'><span class="nv">$post</span><span class="o">-&gt;</span><span class="na">tags</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">detach</span><span class="p">(</span><span class="nv">$tag</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// set all tags (will also remove any current set but not passed in)</span>
+</span><span class='line'><span class="nv">$other_tag</span> <span class="o">=</span> <span class="nx">Tag</span><span class="o">::</span><span class="na">findById</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$post</span><span class="o">-&gt;</span><span class="na">tags</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">sync</span><span class="p">([</span><span class="nv">$tag</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">,</span> <span class="nv">$other_tag</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">]);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// remove all tags from a post</span>
+</span><span class='line'><span class="nv">$post</span><span class="o">-&gt;</span><span class="na">tags</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">detach</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Actually <code>attach</code> and <code>detach</code> can accept instances of <code>Eloquent\Model</code> but only if you&rsquo;re attaching or detaching one &ndash; they cannot be used if arrays are passed</li>
+</ul>
+
+
+<h3>Fetching</h3>
+
+<p>Using Eloquent with <code>where</code>, <code>orWhere</code>, <code>take</code>, etc. uses the query builder. Once a query is complete and you need to get the actual collection of models the following methods are available:</p>
+
+<ul>
+<li><code>Model::all()</code> gets everything (minus trashed)</li>
+<li><code>Model::where(/* condition */)-&gt;get()</code> gets the collection filtered by the query builder</li>
+<li><code>Model::first()</code> gets the first result from the possible set that would be returned</li>
+<li><code>Model::pluck($field)</code> returns a string representing the value in the passed field &ndash; if the query would have returned multiple results, the first is chosen and the value of its <code>$field</code> field is returned (i.e. as if <code>first</code> is chained before <code>pluck</code>)</li>
+<li><code>Model::lists($field)</code> returns an array of the above &ndash; this time, multiple results are allowed, also duplicates will be returned if the database has duplicates</li>
+<li><code>Model::distinct($field)-&gt;lists($field)</code> is a much more useful version of the above line &ndash; it&rsquo;ll strip duplicate field values and then return them in an array</li>
+<li><code>Model::toSql()</code> is useful for debugging &ndash; return the current query as an SQL string to be executed</li>
+</ul>
+
+
+<h3>Nested Wheres</h3>
+
+<p>A few examples of converting SQL to Eloquent/Fluent query builder calls, as it&rsquo;s slightly counter-intuitive:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// SELECT * FROM `table` WHERE `x` AND (`y` OR `z`)</span>
+</span><span class='line'><span class="nx">Model</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="cm">/* x */</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$query</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$query</span><span class="o">-&gt;</span><span class="p">(</span><span class="cm">/* y */</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">orWhere</span><span class="p">(</span><span class="cm">/* z */</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// SELECT * FROM `table` WHERE `x` OR (`y` AND `z`)</span>
+</span><span class='line'><span class="nx">Model</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="cm">/* x */</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">orWhere</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$query</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$query</span><span class="o">-&gt;</span><span class="p">(</span><span class="cm">/* y */</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="cm">/* z */</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Boot method</h3>
+
+<p>Like service providers, eloquent models have a <code>boot</code> method. This method is like a static constructor (as far as I can tell) in that it will only be called once, but it is also lazily-executed: it gets called the first time a model is instantiated. If a model should register its own event listeners, then it should be done here.</p>
+
+<p>Example:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">Post</span> <span class="k">extends</span> <span class="nx">Eloquent</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="c1">// called once when Post is first used</span>
+</span><span class='line'>    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">boot</span><span class="p">()</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="c1">// there is some logic in this method, so don&#39;t forget this!</span>
+</span><span class='line'>        <span class="k">parent</span><span class="o">::</span><span class="na">boot</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nx">Post</span><span class="o">::</span><span class="na">saving</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$post</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="c1">// or something</span>
+</span><span class='line'>            <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">updated_at</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DateTime</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">});</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// called for every new instance of Post</span>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">PostRepository</span> <span class="nv">$posts</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">posts</span> <span class="o">=</span> <span class="nv">$posts</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Routing</h2>
+
+<p>Just some more detail on the less-discussed commands:</p>
+
+<ul>
+<li><p><code>Route::when($pattern, $names [, $methods = null])</code></p>
+
+<p>  Register a filter or set of filters against a URI rather than route.</p>
+
+<p>  Normally, you register filters (e.g. <code>csrf</code> and <code>auth</code>) on individual routes, or on a route group, but you can apply them to a given URI pattern. This may be useful, but may also break easily-modifiable URIs by meaning that a given URI must be changed in two places if it changes. The third parameter, <code>$methods</code>, can take an array of HTTP methods.</p></li>
+<li><p>`Route::pattern($key, $pattern)</p>
+
+<p>  Set a global <code>where</code> pattern for a given named parameter for all routes.</p>
+
+<p>  In a route with named parameters, you can specify a regex requirement for each parameter with <code>where</code>. If the same named parameter is used in multiple routes, rather than re-specifying the <code>where</code> for each one, this method can be used to say &ldquo;wherever you see <code>$key</code>, add a where constraint of <code>$where</code>&rdquo;</p></li>
+<li><p><code>Route::model($key, $model)</code></p>
+
+<p>  Much like for <code>Route::pattern</code>, register a given model for the specified named parameter for all routes. The value of the parameter will be interpreted as an <code>id</code> that should be used to search for the given model instance.</p>
+
+<p>  <code>$model</code> should be a fully-qualified classname.</p></li>
+<li><p><code>Route::bind($key, Closure $resolver)</code></p>
+
+<p>  In cases where an <code>id</code> lookup will not suffice, we can use a closure to look a given model up from the parameter&rsquo;s value instead. The value is passed into the closure and whatever the closure returns (should be an instance of <code>Eloquent\Model</code>) will be passed to the route&rsquo;s action method (closure or controller method).</p>
+
+<p>  This method is very useful for looking up URI slugs, for example, as well as more complex lookups.</p></li>
+<li><p><code>Route::controller($uri, $classname)</code></p>
+
+<p>  Wildcard routing to a controller using the passed URI as a prefix. The first segment that comes after <code>$uri</code> in the URI is turned into the method name on the controller, prefixed with the HTTP method (get, post, etc.). Examples for <code>Route::controller('user', 'UserController')</code>:</p>
+
+<ul>
+<li><code>GET /user</code> ⟶ <code>UserController@getIndex() // (I think)</code></li>
+<li><code>GET /user/list</code> ⟶ <code>UserController@getList()</code></li>
+<li><code>POST /user/edit/1</code> ⟶ <code>UserController@postEdit(1)</code></li>
+</ul>
+
+
+<p>  <code>$classname</code> should be a fully-qualified classname to the controller.</p>
+
+<p>  This can also be called as <code>Route::controllers(array $mapping)</code> which takes a single parameter which is an array that maps uri ⟶ classname.</p>
+
+<p>  The general advice is not to use this though, instead going with explicit routing as much as possible.</p></li>
+<li><p><code>Route::resource($uri, $classname)</code></p>
+
+<p>  Like <code>Route::controller</code> it allows a form of predefined routing to a controller. However, the <code>resource</code> method has very specific rules that follows RESTful principles. As such, it will automatically register routes like:</p>
+
+<ul>
+<li><code>GET /uri</code></li>
+<li><code>GET /uri/{id}</code></li>
+<li><code>POST /uri/{id}</code></li>
+<li><code>DELETE /uri/{id}</code></li>
+</ul>
+
+
+<p>  <code>$classname</code> should be a fully-qualified classname to the controller.</p>
+
+<p>  This method is only useful for setting up routing for an API really.</p></li>
+</ul>
+
+
+<h2>The View class</h2>
+
+<ul>
+<li><p><code>View::share()</code></p>
+
+<p>  Inject a view variable that will be available in all views.</p></li>
+<li><p><code>View::name()</code></p>
+
+<p>  Register a named view. Like IoC container <code>alias</code> function, but works like named routes. Also can&rsquo;t be used with <code>View::make</code> but instead should be used with <code>View::of</code>. At least as far as I can tell.</p></li>
+<li><p><code>View::of($view, $data = array())</code></p>
+
+<p>  Render (well return) a named view. Just like <code>View::make</code> but for named views. As far as I know. Not really sure about the use-case here, it&rsquo;s just something I saw and thought I should document.</p></li>
+</ul>
+
+
+  
+    <footer>
+      
+      
+        <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://alexrussell.me.uk/laravel-cheat-sheet/index.html" data-via="alexrussell101" data-counturl="http://alexrussell.me.uk/laravel-cheat-sheet/index.html" >Tweet</a>
+  
+  
+  
+</div>
+
+      
+    </footer>
+  
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/11/01/laravel-digest-october-2013/">Laravel Digest (October 2013)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/10/04/laravel-digest-september-2013/">Laravel Digest (September 2013)</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/alexrussell">@alexrussell</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'alexrussell',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Alex Russell -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

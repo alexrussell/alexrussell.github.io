@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Laravel | Alex's Blog]]></title>
+  <link href="http://alexrussell.me.uk/blog/categories/laravel/atom.xml" rel="self"/>
+  <link href="http://alexrussell.me.uk/"/>
+  <updated>2013-10-16T11:47:16+01:00</updated>
+  <id>http://alexrussell.me.uk/</id>
+  <author>
+    <name><![CDATA[Alex Russell]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Laravel Digest (October 2013)]]></title>
+    <link href="http://alexrussell.me.uk/blog/2013/11/01/laravel-digest-october-2013/"/>
+    <updated>2013-11-01T13:20:00+00:00</updated>
+    <id>http://alexrussell.me.uk/blog/2013/11/01/laravel-digest-october-2013</id>
+    <content type="html"><![CDATA[<p>Welcome to the second installment of Laravel Digest, the series where I give a regular rundown of important changes, fixes and additions to Laravel&rsquo;s master branch. Below are the changes up to the end of October 2013</p>
+
+<ul>
+<li><p>Blade braces can now be escaped using <code>@</code> whch is useful for people using clientside templating languages that also use the braces (<code>cb93bf3</code>):</p>
+
+<p>  The following code will output <code>hello</code>
+  <code>blade
+  hello
+ </code></p>
+
+<p>  The following code will output <code>hello</code>
+  <code>blade
+  @
+ </code></p>
+
+<p>  Use case, using handlebars.js:
+  <code>blade
+  &lt;div class="name"&gt;@&lt;/div&gt;
+ </code></p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Laravel Digest (September 2013)]]></title>
+    <link href="http://alexrussell.me.uk/blog/2013/10/04/laravel-digest-september-2013/"/>
+    <updated>2013-10-04T10:55:00+01:00</updated>
+    <id>http://alexrussell.me.uk/blog/2013/10/04/laravel-digest-september-2013</id>
+    <content type="html"><![CDATA[<p>Introducing Laravel digest, where I let you know what&rsquo;s changed in the most recent commits to Laravel. I like to think of it as me reading the commitlog so you don&rsquo;t have to. The general idea is that I&rsquo;ll list out any notable changes on the master branch (although really I&rsquo;m looking at both master and 4.0) since the previous update. I pretty much decide what&rsquo;s classed as notable, but usually it&rsquo;ll be stuff that actually affects the way developers work, so small bugfixes won&rsquo;t be in, but new features or uses of existing components are included.</p>
+
+<p>As this is the first installment of Laravel digest there&rsquo;s no &ldquo;since last time&rdquo; so I&rsquo;m arbitrarily deciding its since about mid-September. A fortnight seems like a good period of time between updates (and maybe longer where Taylor has less time to spend on the framework).</p>
+
+<p>So, without further ado:</p>
+
+<p>Notable recent changes (since approx. 15 September 2013) on master specifically (but most apply to 4.0 too):</p>
+
+<ul>
+<li><p><code>artisan tinker</code> is now a full REPL using <a href="https://github.com/d11wtq/boris">Boris</a> (<code>5e8d2c0</code>)</p>
+
+<ul>
+<li>Does require <code>ext_readline</code> and <code>ext_posix</code> if you want to use it though (ouch!)</li>
+</ul>
+</li>
+<li><p>Views can have data added eloquently (<code>e7fd520</code>)</p>
+
+<p>  ``` php
+  &lt;?php</p>
+
+<p>  // this
+  return View::make(&lsquo;view.name&rsquo;)&ndash;>with([&lsquo;user&rsquo; => $user]);</p>
+
+<p>  // or this
+  return View::make(&lsquo;view.name&rsquo;, [&lsquo;user&rsquo; => $user]);</p>
+
+<p>  // becomes this
+  return View::make(&lsquo;view.name&rsquo;)&ndash;>withUser($user);
+  ```</p></li>
+<li><p>View composers can have a priority attached so they run in a given order (<code>fb4fe45</code>)</p></li>
+<li><p>Developers can specify a protected instance <code>dates</code> array in their Eloquent models that returns an array of fields that should be treated like dates (<code>f15b034</code>)</p></li>
+<li><p>Query builder/Eloquent now has a chunk method that allows for working through large datasets without killing RAM usage (<code>11d3e98</code>):</p>
+
+<p>  ``` php
+  &lt;?php</p>
+
+<p>  User::whereActive(&lsquo;1&rsquo;)&ndash;>chunk(
+      100, // per chunk
+      function($results) {
+          // do something with set of 100 results at a time
+      }
+  );
+  ```</p></li>
+<li><p><code>Route::group</code> config array now accepts a <code>namespace</code> string that will automatically prefix controller names with the namespace &ndash; they can even be nested (<code>3d0400e</code>)</p>
+
+<p>  ``` php
+  &lt;?php</p>
+
+<p>  // something a bit like this
+  Route::group(
+      [&lsquo;prefix&rsquo; => &lsquo;admin&rsquo;],
+      function() {
+          Route::get(&lsquo;some/url&rsquo;, &lsquo;MyApp\Admin\UserController@index&rsquo;);
+          Route::get(&lsquo;some/other/url&rsquo;, &lsquo;MyApp\Admin\UserController@edit&rsquo;);
+      }
+  );</p>
+
+<p>  // can become the slightly cleaner
+  Route::group(
+      [&lsquo;prefix&rsquo; => &lsquo;admin&rsquo;, &lsquo;namespace&rsquo; => &lsquo;MyApp\Admin&rsquo;],
+      function() {
+          Route::get(&lsquo;users&rsquo;, &lsquo;UserController@index&rsquo;);
+          Route::get(&lsquo;user/edit&rsquo;, &lsquo;UserController@edit&rsquo;);
+      }
+  );
+  ```</p></li>
+<li><p>Query builder/Eloquent can now find multiple rows with <code>find()</code> by passing an array (<code>14d969c</code>)</p>
+
+<p>  ``` php
+  &lt;?php</p>
+
+<p>  // get users 1 and 5
+  $users = User::find([1, 5])&ndash;>get();
+  ```</p></li>
+<li><p>Can get current environment using <code>artisan env</code> (useful for debugging weird database connection issues with artisan &ndash; not so useful for knowing what environment the web site is running as artisan and the running web instance will use different methods to determine the environment, so they could quite easily be different) (<code>5c7ba12</code>)</p></li>
+<li><p>Can now return an ArrayObject from a route action and it&rsquo;ll be serialised as JSON (previously it was just just bare arrays and JsonableInterface objects) (<code>bd4b0c6</code>)</p></li>
+<li><p>Packages' views can now be published (like config and assets were) using <code>artisan view:publish</code> (<code>44a27da</code>)</p></li>
+<li><p>Paginator can now be returned from a route action and it&rsquo;ll be serialised to JSON (good for paginated responses in APIs) (<code>5875b60</code>)</p></li>
+<li><p>Eloquent query builder now has <code>firstOrNew</code> and <code>firstOrCreate</code> methods (<code>fce86bc</code>):</p>
+
+<ul>
+<li><code>firstOrNew</code> tries to use the passed array of attributes to find the model, and if it can&rsquo;t find it it&rsquo;ll create a new (unsaved) instance of the model</li>
+<li><code>firstOrCreate</code> tries to use the passed array of attributes to find the model, and if it can&rsquo;t find it it&rsquo;ll create a new instance of the model and save it immediately</li>
+<li><strong>Implementation note:</strong> this also uses a convenient new method <code>firstByAttributes</code> which is unfortunately protected in <code>Illuminate\Database\Eloquent\Model</code>. The method is nothing special, just cycles through the array adding <code>where</code>s to a query builder</li>
+</ul>
+</li>
+<li><p>new <code>Redirect::away</code> method allows passing of any URL &ndash; the passed URL is not validated, works just like <code>Redirect::to</code> otherwise (<code>8c47d11</code>)</p></li>
+<li><p>Remote feature now allows setting the port (<code>3f7c47c</code>)</p></li>
+<li><p>Like the Eloquent view data from <code>e7fd520</code>, redirects can do the same (<code>97bbfe6</code>):</p>
+
+<p>  ``` php
+  &lt;?php</p>
+
+<p>  Redirect::route(&lsquo;login&rsquo;)&ndash;>withMessage(&lsquo;Please log in&rsquo;);
+  ```</p></li>
+<li><p>Validator now has a <code>sometimes</code> method that allows to set conditional rules (<code>ffa70d3</code>, <a href="http://laravel.com/docs/validation#conditionally-adding-rules">docs</a>):</p>
+
+<p>  ``` php
+  &lt;?php</p>
+
+<p>  // say we&rsquo;re validating some kind of user type &ndash; if &lsquo;business_type&rsquo; is set
+  // to &lsquo;business&rsquo; then &lsquo;business_name&rsquo; is requied</p>
+
+<p>  $v = Validator::make($data, [
+      &lsquo;email&rsquo;        => &lsquo;required|email&rsquo;,
+      &lsquo;name&rsquo;         => &lsquo;required&rsquo;,
+      &lsquo;license_type&rsquo; => &lsquo;required&rsquo;,
+  ]);</p>
+
+<p>  // this rule only applies when the closure returns true
+  $v->sometimes(&lsquo;business_name&rsquo;, &lsquo;required&rsquo;, function($input) {
+      return $input->license_type == &lsquo;business&rsquo;;
+  });
+  ```</p>
+
+<p>  The first parameter to <code>sometimes</code> can be an array that specifies multiple rules:</p>
+
+<p>  ``` php
+  &lt;?php</p>
+
+<p>  // Example: in the checkout area of an ecommerce site, only require the delivery
+  // fields to be set if the &lsquo;deliver to my billing address&rsquo; field is not checked</p>
+
+<p>  $v->sometimes(
+      [&lsquo;delivery_name&rsquo;, &lsquo;delivery_address&rsquo;, &lsquo;delivery_country&rsquo; /<em> etc. </em>/],
+      &lsquo;required&rsquo;,
+      function($input) {
+          return $input->deliver_to_billing_address != &lsquo;yes&rsquo;;
+      }
+  );
+  ```</p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>
