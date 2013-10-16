@@ -2,10 +2,10 @@
 #      Main Configs       #
 # ----------------------- #
 
-url: http://yoursite.com
-title: My Octopress Blog
-subtitle: A blogging framework for hackers.
-author: Your Name
+url: http://alexrussell.me.uk
+title: Alex's Blog
+subtitle: The blog of Alex
+author: Alex Russell
 simple_search: http://google.com/search
 description:
 
@@ -13,13 +13,16 @@ description:
 # You can customize the format as defined in
 # http://www.ruby-doc.org/core-1.9.2/Time.html#method-i-strftime
 # Additionally, %o will give you the ordinal representation of the day
-date_format: "ordinal"
+date_format: "%o %B %Y"
+
+future: false
 
 # RSS / Email (optional) subscription links (change if using something like Feedburner)
 subscribe_rss: /atom.xml
 subscribe_email:
 # RSS feeds can list your email address if you like
 email:
+email_md5: 40b8a76ccad69f24259200911d760abe
 
 # ----------------------- #
 #    Jekyll & Plugins     #
@@ -27,7 +30,7 @@ email:
 
 # If publishing to a subdirectory as in http://site.com/project set 'root: /project'
 root: /
-permalink: /blog/:year/:month/:day/:title/
+permalink: /blog/:year/:month/:title/
 source: source
 destination: public
 plugins: plugins
@@ -63,13 +66,13 @@ default_asides: [asides/recent_posts.html, asides/github.html, asides/delicious.
 # ----------------------- #
 
 # Github repositories
-github_user:
+github_user: alexrussell
 github_repo_count: 0
 github_show_profile_link: true
 github_skip_forks: true
 
 # Twitter
-twitter_user:
+twitter_user: alexrussell101
 twitter_tweet_button: true
 
 # Google +1
