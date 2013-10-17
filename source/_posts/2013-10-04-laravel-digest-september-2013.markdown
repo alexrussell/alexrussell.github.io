@@ -15,7 +15,7 @@ So, without further ado:
 Notable recent changes (since approx. 15 September 2013) on master specifically (but most apply to 4.0 too):
 
 - `artisan tinker` is now a full REPL using [Boris](https://github.com/d11wtq/boris) (`5e8d2c0`)
-    - Does require `ext_readline` and `ext_posix` if you want to use it though (ouch!)
+    - It does, however, require `ext_readline` and `ext_posix` if you want to use it though (ouch!)
 
 - Views can have data added eloquently (`e7fd520`)
 
