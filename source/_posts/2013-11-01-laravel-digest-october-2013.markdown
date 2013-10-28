@@ -37,6 +37,35 @@ Use case, using handlebars.js:
     - As a consequence of this work, the logging system was simplified down to a single log file by default (no daily rotation and no SAPI name, this looks like it may generate rather large log files to me, I'd have preferred to keep daily rotation) ([`laravel/laravel@088f4b6`](https://github.com/laravel/laravel/commit/088f4b69b6b9846dd54b55688f11e44b9bc73483))
     - Also as a consequence, the live debugging through sockets was removed. Now the `tail` command will tail a remote log file if there's a remote connection specified, or tail the local log file if there's no remote connection specified ([`f62d1a7`](link)/[`763a0265`](link))
 
-- Router input method? - TODO
+- Router input method? (This is on the changelog but I don't know what it refers to) - TODO
 
-- x
+- Controller filters can now be added as controller functions using the `@` syntax as a shorthand (see [issue 2432](https://github.com/laravel/framework/issues/2432)) ([`d0e0c63`](link)):
+
+``` php
+<?php
+
+class UserController extends Contoller
+{
+    public function __construct()
+    {
+        // before:
+        $this->beforeFilter(function ($route) {
+            return $this->hasPermission($route);
+        }, ['only' => 'edit']);
+
+        // after, shorthand
+        $this->beforeFilter('@hasPermission', ['only' => 'edit']);
+    }
+
+    public function hasPermission($route)
+    {
+        $id = $route->getParameter('id');
+
+        if (! Auth::user()->ownsPost($id)) {
+            return Response::make('You are not authorised to edit this post', 401);
+        }
+    }
+}
+```
+
+- Can now pass DateTime and Carbon instances to Cache method that accept a duration (in this case, the time difference between now and the time passed is calculated in minutes) ([`977f803`](link))
