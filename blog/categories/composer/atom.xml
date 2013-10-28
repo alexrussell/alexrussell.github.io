@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Composer | Alex's Blog]]></title>
+  <link href="http://alexrussell.me.uk/blog/categories/composer/atom.xml" rel="self"/>
+  <link href="http://alexrussell.me.uk/"/>
+  <updated>2013-10-28T10:20:37+00:00</updated>
+  <id>http://alexrussell.me.uk/</id>
+  <author>
+    <name><![CDATA[Alex Russell]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Adding Project Dependencies with composer require]]></title>
+    <link href="http://alexrussell.me.uk/blog/2013/10/adding-project-dependencies-with-composer-require/"/>
+    <updated>2013-10-25T20:22:00+01:00</updated>
+    <id>http://alexrussell.me.uk/blog/2013/10/adding-project-dependencies-with-composer-require</id>
+    <content type="html"><![CDATA[<p>Composer&rsquo;s been around for some time now, and gained a lot of popularity since its use in Laravel 4. I noticed back in the first half of 2013 that a lot of blogs and tutorials were teaching installation of packages (or, more correctly, addition of project dependencies) by editing your <code>composer.json</code> file&rsquo;s <code>require</code> array and then doing a <code>composer update</code> on the command line. I thought back then that maybe because composer was new to these people (in general these were related to Laravel 4 which was in development at the time) they hadn&rsquo;t yet discovered the easier, and technically less error-prone, way to do this that very few people seemed to be using and advising: <code>composer require</code></p>
+
+<p>Well it seems that most people still haven&rsquo;t discovered the command, so I figured I should write about it. Instead of erroneously manually editing your <code>composer.json</code> file to add a new package to your project&rsquo;s dependencies and then calling <code>composer update</code>, you can use <code>composer require</code> to do the job for you. You&rsquo;re having to use the command line anyway, so why not skip the manual editing of <code>composer.json</code> part?</p>
+
+<p>The syntax is really simple:</p>
+
+<pre><code>composer require vendor/package version
+</code></pre>
+
+<p>It&rsquo;s as easy as that. And you can even require a dev dependency with the <code>--dev</code> option:</p>
+
+<pre><code>composer require mockery/mockery 0.8.0 --dev
+</code></pre>
+
+<p>In fact, the command can be used to add multiple packages to your project&rsquo;s dependencies by simply separating them with a space. In this case, it&rsquo;s probably best to use the alternative version constraint syntax which is <code>vendor/package:version</code> or <code>vendor/package=version</code>:</p>
+
+<pre><code>composer require --dev mockery/mockery:0.8.0 phpunit/phpunit:~3.7.4
+</code></pre>
+
+<p>Also notice how the <code>--dev</code> can go either before or after the packages &mdash; use what works best for you.</p>
+
+<hr />
+
+<p>There is one caveat to this: if you wish to use the asterisk to denote any patch or minor version is okay, then it&rsquo;s best to put the argument in question in quotes so that your shell doesn&rsquo;t try (and probably fail) to interpret it as a glob on the filesystem. In my case (using <a href="http://fishshell.com/">fish</a>) the following happens:</p>
+
+<pre><code>&gt; composer require mockery/mockery 0.8.* --dev
+fish: No matches for wildcard '0.8.*'.
+composer require mockery/mockery 0.8.* --dev
+                                 ^
+</code></pre>
+
+<p>However, with the argument quoted it&rsquo;s all good:</p>
+
+<pre><code>composer require "mockery/mockery 0.8.*" --dev
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>
