@@ -16,3 +16,11 @@ body {
 .about-me p {
 	margin: 10px 0;
 }
+
+hr {
+	height: 0;
+	margin: 20px 0;
+	border: none;
+	border-top: 1px solid #ddd;
+	border-bottom: 1px solid #fff;
+}
