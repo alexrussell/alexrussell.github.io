@@ -69,3 +69,44 @@ class UserController extends Contoller
 ```
 
 - Can now pass DateTime and Carbon instances to Cache method that accept a duration (in this case, the time difference between now and the time passed is calculated in minutes) ([`977f803`](link))
+
+- Now uses [Stack](http://stackphp.com/) for middleware (multiple commits). Repercussions:
+
+    - `close` application hook is now deprecated in favour of using a stack middleware ([`18e1aec`](link))
+    - probably many more
+
+- Should now use Input::cookie for cookies, not Cookie::get ([`e0fe79e`](link) removed `Cookie::get()` and [`58ec2fe`](link) for temporary deprecation code in the facade)
+
+- If using MySQL, `UPDATE` queries can now have `orderBy` and `limit` specified ([`d9d61e1`](link))
+
+- As with overriding packages' config and views, translations can now be overridden using a similar convention ([`5483042`](link))
+
+    - It should be noted that the convention is not the same: it is not `app/lang/packages/vendor/package/` but uses the namespace (i.e. package name) *only*, like when referencing views/config (i.e. `View::make('namespace:path.view')` and `Config:get('namespace:config.key')`)
+
+    - Files for a package `vendor/package` in locale `en` should go in `app/lang/packages/en/package/` -- see how it's just `package` not `vendor/package` like it would be for config and views
+
+    - So to reiterate, for a package called `vendor/package`:
+
+        - Views: `View::make('package::some/view')` ⟶ `app/views/packages/vendor/package/some/view{.blade}.php`
+        - Config: `Config::get('package::some.key')` ⟶ `app/config/packages/vendor/package/some.php`, then key `key`
+        - Translations: `Lang::get('package::some.key')` ⟶ `app/lang/packages/en/package/some.php`, then key `key`
+
+- You can now use `Auth::viaRemember()` to determine whether the logged-in user was authorised through the 'remember me' cookie or not ([`2184ad4`](link))
+
+- New `bindShared` method on the IoC container which should now be used in place of the old share syntax (['`077233b3`](link)):
+
+``` php
+// this
+$this->app['my.key'] = $this->app->share(function ($app) {
+    return new MyClass();
+});
+
+// becomes this
+$this->app->bindShared('my.key', function ($app) {
+    return new MyClass();
+});
+```
+
+- `ServiceProvider` no longer uses very weird logic to guess a package's namespace. This probably won't affect many people but I'm pointing it out as it has affected me and it's good to know for future reference ([`6089525`](link))
+
+- You can now pass a view to `Paginator::links([$view])` in order to override the default view for that call ([`9d1150c`](link))
