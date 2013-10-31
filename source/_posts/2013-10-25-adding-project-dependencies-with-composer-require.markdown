@@ -8,7 +8,7 @@ title: "Adding Project Dependencies with composer require"
 
 Composer's been around for some time now, and gained a lot of popularity since its use in Laravel 4. I noticed back in the first half of 2013 that a lot of blogs and tutorials were teaching installation of packages (or, more correctly, addition of project dependencies) by editing your `composer.json` file's `require` array and then doing a `composer update` on the command line. I thought back then that maybe because composer was new to these people (in general these were related to Laravel 4 which was in development at the time) they hadn't yet discovered the easier, and technically less error-prone, way to do this that very few people seemed to be using and advising: `composer require`
 
-Well it seems that most people still haven't discovered the command, so I figured I should write about it. Instead of erroneously manually editing your `composer.json` file to add a new package to your project's dependencies and then calling `composer update`, you can use `composer require` to do the job for you. You're having to use the command line anyway, so why not skip the manual editing of `composer.json` part?
+Well it seems that most people still haven't discovered the command, so I figured I would write about it. Instead of (possibly erroneously) manually editing your `composer.json` file to add a new package to your project's dependencies and then calling `composer update`, you can use `composer require` to do the job for you. You're having to use the command line anyway, so why not skip the manual editing of `composer.json` part?
 
 The syntax is really simple:
 
@@ -23,6 +23,8 @@ In fact, the command can be used to add multiple packages to your project's depe
     composer require --dev mockery/mockery:0.8.0 phpunit/phpunit:~3.7.4
 
 Also notice how the `--dev` can go either before or after the packages -- use what works best for you.
+
+Another good thing about it is that if anything goes wrong during installation of the packages or their dependencies then Composer will leave your composer.json file unchanged.
 
 ---
 
