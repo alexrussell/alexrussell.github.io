@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Laravel Digest | Alex's Blog]]></title>
   <link href="http://alexrussell.me.uk/blog/categories/laravel-digest/atom.xml" rel="self"/>
   <link href="http://alexrussell.me.uk/"/>
-  <updated>2013-10-31T13:11:42+00:00</updated>
+  <updated>2013-11-01T16:07:46+00:00</updated>
   <id>http://alexrussell.me.uk/</id>
   <author>
     <name><![CDATA[Alex Russell]]></name>
@@ -12,6 +12,151 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Laravel Digest (October 2013)]]></title>
+    <link href="http://alexrussell.me.uk/blog/2013/11/laravel-digest-october-2013/"/>
+    <updated>2013-11-01T13:20:00+00:00</updated>
+    <id>http://alexrussell.me.uk/blog/2013/11/laravel-digest-october-2013</id>
+    <content type="html"><![CDATA[<p>Welcome to the second instalment of Laravel Digest, the series where I give a regular rundown of important changes, fixes and additions to Laravel&rsquo;s master branch. Below are the changes up to the end of October 2013</p>
+
+<ul>
+<li>Blade braces can now be escaped using <code>@</code> which is useful for people using clientside templating languages that also use the braces (<a href="https://github.com/laravel/framework/commit/cb93bf3df8d25c04939462f81b75ddb9e4e6faa0"><code>cb93bf3</code></a>):</li>
+</ul>
+
+
+<p>The following code will output <code>hello</code>
+<code>html
+{{ 'hello' }}
+</code></p>
+
+<p>The following code will output <code>hello</code>
+<code>html
+@{{ $variable }}
+</code></p>
+
+<p>Use case, using handlebars.js:
+<code>html
+&lt;div class="name"&gt;@{{ user.name }}&lt;/div&gt;
+</code></p>
+
+<ul>
+<li><p>Queued cookies &ndash; because cookies can only be attached to a request, using <code>Cookie::set()</code> before the request was instantiated previous lost the cookie (or simply wasn&rsquo;t allowed). Now <code>Cookie::queue()</code> can be used to queue cookies for eventual sending with the request.</p></li>
+<li><p><code>Route::controller</code> is back and appears slightly cleverer than before in that it first seeks out all callable methods on the given controller and adds each route individually, then sets up a &lsquo;default&rsquo; route for anything it can&rsquo;t detect (<a href="https://github.com/laravel/framework/commit/98c14a9f90ada608418490e4cfacd51f4ebda384"><code>98c14a9</code></a>)</p>
+
+<ul>
+<li><code>Route::controllers</code> can also be used to hook multiple controllers up in one go by passing an associative array of uri to controller FQCN</li>
+</ul>
+</li>
+<li><p><code>App::env()</code> can now be used to check the environment against a list provided (array or multiple arguments) (<a href="https://github.com/laravel/framework/commit/66e5a0b32f61b1ec0e14aa4bc4219d15c2a247c7"><code>66e5a0b</code></a>)</p></li>
+<li><p>Remote tail command (<code>artisan tail</code>) allows tailing of a remote log file (assuming the remote connection is set up correctly in the config and the remote project uses a single log file) (<a href="https://github.com/laravel/framework/commit/25b1cac27080641b289c2ad791b734efff92bcef"><code>25b1cac</code></a>)</p>
+
+<ul>
+<li>As a consequence of this work, the logging system was simplified down to a single log file by default (no daily rotation and no SAPI name, this looks like it may generate rather large log files to me, I&rsquo;d have preferred to keep daily rotation) (<a href="https://github.com/laravel/laravel/commit/088f4b69b6b9846dd54b55688f11e44b9bc73483"><code>laravel/laravel@088f4b6</code></a>)</li>
+<li>Also as a consequence, the live debugging through sockets was removed. Now the <code>tail</code> command will tail a remote log file if there&rsquo;s a remote connection specified, or tail the local log file if there&rsquo;s no remote connection specified (<a href="https://github.com/laravel/framework/commit/f62d1a727155073357babee95a8f679003a8b93c"><code>f62d1a7</code></a>/<a href="https://github.com/laravel/framework/commit/763a02652ba23a9b61f59b47c05ab146bbe76136"><code>763a0265</code></a>)</li>
+</ul>
+</li>
+<li><p>New <code>Router::input()</code> method that allows you to get the value of a named route parameter (<a href="https://github.com/laravel/framework/commit/28e36bbc0296e3b4cdf5ae18c5a972923c05b4de"><code>28e36bb</code></a>)</p></li>
+<li><p>Controller filters can now be added as controller functions using the <code>@</code> syntax as a shorthand (see <a href="https://github.com/laravel/framework/issues/2432">issue 2432</a>) (<a href="https://github.com/laravel/framework/commit/d0e0c632e2b3ff15746e48ec7bd57c5cc51d0ae0"><code>d0e0c63</code></a>):</p></li>
+</ul>
+
+
+<p>``` php
+&lt;?php</p>
+
+<p>class UserController extends Contoller
+{</p>
+
+<pre><code>public function __construct()
+{
+    // before:
+    $this-&gt;beforeFilter(function ($route) {
+        return $this-&gt;hasPermission($route);
+    }, ['only' =&gt; 'edit']);
+
+    // after, shorthand
+    $this-&gt;beforeFilter('@hasPermission', ['only' =&gt; 'edit']);
+}
+
+public function hasPermission($route)
+{
+    $id = $route-&gt;getParameter('id');
+
+    if (! Auth::user()-&gt;ownsPost($id)) {
+        return Response::make('You are not authorised to edit this post', 401);
+    }
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<ul>
+<li><p>Can now pass DateTime and Carbon instances to Cache method that accept a duration (in this case, the time difference between now and the time passed is calculated in minutes) (<a href="https://github.com/laravel/framework/commit/977f803030b84ce28f034bcf925f93bfb029a0d4"><code>977f803</code></a>)</p></li>
+<li><p>Now uses <a href="http://stackphp.com/">Stack</a> for middleware (multiple commits). Repercussions:</p>
+
+<ul>
+<li><code>close</code> application hook is now deprecated in favour of using a stack middleware (<a href="https://github.com/laravel/framework/commit/18e1aecb69897b9533968d4c9f291f3a522ef98f"><code>18e1aec</code></a>)</li>
+<li>Presumably more&hellip;</li>
+</ul>
+</li>
+<li><p>Should now use Input::cookie for cookies, not Cookie::get (<a href="https://github.com/laravel/framework/commit/e0fe79e398003e54d54f2626e1283e97209b7f50"><code>e0fe79e</code></a> removed <code>Cookie::get()</code> and <a href="https://github.com/laravel/framework/commit/58ec2fe05f092bdd09f2e05d8a86633b97417cef"><code>58ec2fe</code></a> for temporary deprecation code in the facade)</p></li>
+<li><p>If using MySQL, <code>UPDATE</code> queries can now have <code>orderBy</code> and <code>limit</code> specified (<a href="https://github.com/laravel/framework/commit/d9d61e13fc2f01efc00c9b87ff6f1e91bab1e9b8"><code>d9d61e1</code></a>)</p></li>
+<li><p>As with overriding packages' config and views, translations can now be overridden using a similar convention (<a href="https://github.com/laravel/framework/commit/5483042e8762d4f8ffc356579ddaae4f7dc3cbc9"><code>5483042</code></a>)</p>
+
+<ul>
+<li><p>It should be noted that the convention is not the same: it is not <code>app/lang/packages/vendor/package/</code> but uses the namespace (i.e. package name) <em>only</em>, like when referencing views/config (i.e. <code>View::make('namespace:path.view')</code> and <code>Config:get('namespace:config.key')</code>)</p></li>
+<li><p>Files for a package <code>vendor/package</code> in locale <code>en</code> should go in <code>app/lang/packages/en/package/</code> &mdash; see how it&rsquo;s just <code>package</code> not <code>vendor/package</code> like it would be for config and views</p></li>
+<li><p>So to reiterate, for a package called <code>vendor/package</code>:</p>
+
+<ul>
+<li>Views: <code>View::make('package::some/view')</code> ⟶ <code>app/views/packages/vendor/package/some/view{.blade}.php</code></li>
+<li>Config: <code>Config::get('package::some.key')</code> ⟶ <code>app/config/packages/vendor/package/some.php</code>, then key <code>key</code></li>
+<li>Translations: <code>Lang::get('package::some.key')</code> ⟶ <code>app/lang/packages/en/package/some.php</code>, then key <code>key</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>You can now use <code>Auth::viaRemember()</code> to determine whether the logged-in user was authorised through the &lsquo;remember me&rsquo; cookie or not (<a href="https://github.com/laravel/framework/commit/2184ad4c8fe5f05b89ae1d5c6f87012cca150101"><code>2184ad4</code></a>)</p></li>
+<li><p>New <code>bindShared</code> method on the IoC container which should now be used in place of the old share syntax (<a href="https://github.com/laravel/framework/commit/07233b32eb190dffde427b3aee1e5e4f855abd00"><code>07233b3</code></a>):</p></li>
+</ul>
+
+
+<p>``` php
+// this
+$this->app[&lsquo;my.key&rsquo;] = $this->app->share(function ($app) {</p>
+
+<pre><code>return new MyClass();
+</code></pre>
+
+<p>});</p>
+
+<p>// becomes this
+$this->app->bindShared(&lsquo;my.key&rsquo;, function ($app) {</p>
+
+<pre><code>return new MyClass();
+</code></pre>
+
+<p>});
+```</p>
+
+<ul>
+<li><p><code>ServiceProvider</code> no longer uses very weird logic to guess a package&rsquo;s namespace. This probably won&rsquo;t affect many people but I&rsquo;m pointing it out as it has affected me and it&rsquo;s good to know for future reference (<a href="https://github.com/laravel/framework/commit/6089525e1293407085c07588f2eb8b2cd8644b01"><code>6089525</code></a>)</p></li>
+<li><p>You can now pass a view to <code>Paginator::links([$view])</code> in order to override the default view for that call (<a href="https://github.com/laravel/framework/commit/9d1150c8851d22cb1a14faa35304b3dc7f17c94b"><code>9d1150c</code></a>)</p></li>
+<li><p>New <code>hasManyThrough</code> relation type (<a href="https://github.com/laravel/framework/commit/0925d868b900372a39c0f9985308004d24bad46d"><code>0925d86</code></a>)</p>
+
+<ul>
+<li>There&rsquo;s no real documentation on this yet and the tests are a little cryptic, so I&rsquo;ll talk more about this in the next update.</li>
+</ul>
+</li>
+<li><p><code>Validator::make</code> can now take a fourth parameter that specified the custom parameters for the validator. Presumably to be used by custom validators. (<a href="https://github.com/laravel/framework/commit/93977e49559ec82e8a82f19bbdfcf4f27cfb4ac0"><code>93977e4</code></a>)</p></li>
+<li><p>IoC container old <code>resolving</code> method is now renamed to <code>resolvingAny</code> and now there&rsquo;s a new <code>resolving</code> method in its place that accepts an abstract object type to only be fired when that abstract type is being resolved (<a href="https://github.com/laravel/framework/commit/aa6df0aa52f588c588c2f0c0646039ad35efe19b"><code>aa6df0a</code></a>)</p></li>
+<li><p>Any alaises bound to a given IoC key will now be removed when rebinding the key (<a href="https://github.com/laravel/framework/commit/8f240f83785e1aebd0d5abf848d8425786a9ba86"><code>8f240f8</code></a>)</p></li>
+<li><p>Queue workers will no no longer run if the application is in maintenance mode (<a href="https://github.com/laravel/framework/commit/a8cdb683a097e04281ada784d9073c8a83f72bf1"><code>a8cdb68</code></a>)</p></li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Laravel Digest (September 2013)]]></title>
