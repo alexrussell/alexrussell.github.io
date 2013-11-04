@@ -6,7 +6,7 @@ comments: false
 title: "Laravel Digest (October 2013)"
 ---
 
-Welcome to the second instalment of Laravel Digest, the series where I give a regular rundown of important changes, fixes and additions to Laravel's master branch. Below are the changes up to the end of October 2013
+Welcome to the second instalment of Laravel Digest, the series where I give a regular rundown of important changes, fixes and additions to Laravel's master branch. Below are the changes up to the end of October 2013:
 
 - Blade braces can now be escaped using `@` which is useful for people using clientside templating languages that also use the braces ([`cb93bf3`](https://github.com/laravel/framework/commit/cb93bf3df8d25c04939462f81b75ddb9e4e6faa0)):
 
