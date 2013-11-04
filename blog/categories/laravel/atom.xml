@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Laravel | Alex's Blog]]></title>
   <link href="http://alexrussell.me.uk/blog/categories/laravel/atom.xml" rel="self"/>
   <link href="http://alexrussell.me.uk/"/>
-  <updated>2013-11-01T16:08:40+00:00</updated>
+  <updated>2013-11-04T13:46:06+00:00</updated>
   <id>http://alexrussell.me.uk/</id>
   <author>
     <name><![CDATA[Alex Russell]]></name>
@@ -18,7 +18,7 @@
     <link href="http://alexrussell.me.uk/blog/2013/11/laravel-digest-october-2013/"/>
     <updated>2013-11-01T13:20:00+00:00</updated>
     <id>http://alexrussell.me.uk/blog/2013/11/laravel-digest-october-2013</id>
-    <content type="html"><![CDATA[<p>Welcome to the second instalment of Laravel Digest, the series where I give a regular rundown of important changes, fixes and additions to Laravel&rsquo;s master branch. Below are the changes up to the end of October 2013</p>
+    <content type="html"><![CDATA[<p>Welcome to the second instalment of Laravel Digest, the series where I give a regular rundown of important changes, fixes and additions to Laravel&rsquo;s master branch. Below are the changes up to the end of October 2013:</p>
 
 <ul>
 <li>Blade braces can now be escaped using <code>@</code> which is useful for people using clientside templating languages that also use the braces (<a href="https://github.com/laravel/framework/commit/cb93bf3df8d25c04939462f81b75ddb9e4e6faa0"><code>cb93bf3</code></a>):</li>
