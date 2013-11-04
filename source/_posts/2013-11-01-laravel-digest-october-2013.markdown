@@ -15,7 +15,7 @@ The following code will output `hello`
 {% raw %}{{ 'hello' }}{% endraw %}
 ```
 
-The following code will output `{% raw %}{{ 'hello' }}{% endraw %}`
+The following code will output `{% raw %}{{ $variable }}{% endraw %}`
 ``` html
 {% raw %}@{{ $variable }}{% endraw %}
 ```
