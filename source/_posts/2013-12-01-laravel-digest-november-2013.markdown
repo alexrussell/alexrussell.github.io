@@ -62,7 +62,7 @@ I'm not sure right now if the `whereHas` affects the `with` (i.e. what actually 
 ``` html
 <!-- this -->
 <div>Hello, {{ isset($username) ? $username : 'anonymous' }}.</div>
-<!-- becomes this -->
+<!-- can now be done like this -->
 <div>Hello, {{ $username or 'anonymous' }}.</div>
 ```
 
@@ -79,3 +79,17 @@ I'm not sure right now if the `whereHas` affects the `with` (i.e. what actually 
 - New `required_without_all` validation rule that works like `required_without` but checks that at least one of the specified fields is present rather than all fields ([`93c1045`](https://github.com/laravel/framework/commit/93c1045fdea4d115d4a9dbc7ae64793bc7063d52))
 
 - Original method that was attempted is passed to `Controller#missingMethod` now as the first parameter, with the additional parameters as an array as the second parameter ([`de871fe`](https://github.com/laravel/framework/commit/de871fe7db2798071e8ca877d04ba7e6629f9f18))
+
+- New Blade `@append` method ([`f0ae98b`](https://github.com/laravel/framework/commit/f0ae98bfd0b07be739eaf9b9bf3505e916d25ca7)):
+
+``` html
+@section('content')
+Some content for the content sectino
+@append
+
+...
+
+@section('content')
+Some more content for the content sectino
+@append
+```
