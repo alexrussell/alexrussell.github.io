@@ -84,12 +84,16 @@ I'm not sure right now if the `whereHas` affects the `with` (i.e. what actually 
 
 ``` html
 @section('content')
-Some content for the content sectino
+Some content for the content section
 @append
 
 ...
 
 @section('content')
-Some more content for the content sectino
+Some more content for the content section
 @append
 ```
+
+- New query builder `rememberForever` method ([`c681584`](https://github.com/laravel/framework/commit/c6815845956e1cbd7039cefe67157ff0b3e8c557))
+
+- New Eloquent model `booting` and `booted` methods ([`2dfb383`](https://github.com/laravel/framework/commit/2dfb3831d62f4689b9e234a83af46551df273609))
