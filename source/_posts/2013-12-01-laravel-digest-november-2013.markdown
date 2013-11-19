@@ -97,3 +97,13 @@ Some more content for the content section
 - New query builder `rememberForever` method ([`c681584`](https://github.com/laravel/framework/commit/c6815845956e1cbd7039cefe67157ff0b3e8c557))
 
 - New Eloquent model `booting` and `booted` methods ([`2dfb383`](https://github.com/laravel/framework/commit/2dfb3831d62f4689b9e234a83af46551df273609))
+
+- `View#withErrors` now accepts an optional parameter that is a object that implements `MessageProviderInterface` (i.e. can be asked for a `MessageBag`)([`3c5ca1a`](https://github.com/laravel/framework/commit/3c5ca1a85dce7fc915c19b3cd197ad03433375b6))
+    - Use case here is for validators: `View::make('some.view')->withErrors($validator);`
+
+- A big change to password resetting/reminder stuff ([`f86d5ea`](https://github.com/laravel/framework/commit/f86d5ea61f6adc2004b8ed259a62cc8008d08fd0))
+    - [Related documentation](TODO)
+
+- `Collection#splice` now returns the extracted elements (if any) as a new `Collection` ([`32f107d`](https://github.com/laravel/framework/commit/32f107dae8c052cc012c272e4d2b2f278b86aade))
+
+- Commas are now allowed in route wildcards ([`fdd378b`](https://github.com/laravel/framework/commit/fdd378bb072d6993be9798aa1772c394e65e5048))
