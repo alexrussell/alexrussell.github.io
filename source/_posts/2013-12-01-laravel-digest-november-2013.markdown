@@ -61,9 +61,9 @@ I'm not sure right now if the `whereHas` affects the `with` (i.e. what actually 
 
 ``` html
 <!-- this -->
-<div>Hello, {{ isset($username) ? $username : 'anonymous' }}.</div>
+<div>Hello, {% raw %}{{ isset($username) ? $username : 'anonymous' }}{% endraw %}.</div>
 <!-- can now be done like this -->
-<div>Hello, {{ $username or 'anonymous' }}.</div>
+<div>Hello, {% raw %}{{ $username or 'anonymous' }}{% endraw %}.</div>
 ```
 
 - Cache entries can now be tagged. New functionality includes using `Cache::tags` to get a list of the tags used in the cache, and items can be flushed by tag ([`70108fe`](https://github.com/laravel/framework/commit/70108fe4f456f343325234063aa77b9012ede7dd))
@@ -102,7 +102,7 @@ Some more content for the content section
     - Use case here is for validators: `View::make('some.view')->withErrors($validator);`
 
 - A big change to password resetting/reminder stuff ([`f86d5ea`](https://github.com/laravel/framework/commit/f86d5ea61f6adc2004b8ed259a62cc8008d08fd0))
-    - [Related documentation](TODO)
+    - [Related documentation (may not yet be complete)](https://github.com/laravel/docs/blob/master/security.md)
 
 - `Collection#splice` now returns the extracted elements (if any) as a new `Collection` ([`32f107d`](https://github.com/laravel/framework/commit/32f107dae8c052cc012c272e4d2b2f278b86aade))
 
