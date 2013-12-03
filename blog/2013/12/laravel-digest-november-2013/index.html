@@ -1,0 +1,455 @@
+
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Laravel Digest (November 2013) - Alex's Blog</title>
+	<meta name="author" content="Alex Russell">
+
+	
+	<meta name="description" content="Laravel Digest (November 2013) Welcome to the third instalment of Laravel Digest, the series where I give a regular rundown of important changes, &hellip;">
+	
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Alex's Blog" type="application/atom+xml">
+	
+	<link rel="canonical" href="http://alexrussell.me.uk/blog/2013/12/laravel-digest-november-2013/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<link href="/stylesheets/font-awesome.min.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700' rel='stylesheet' type='text/css'>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-45080124-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+</head>
+
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<div class="intrude-less">
+			<header id="header" class="inner"><div class="profilepic">
+	
+	<img src="http://www.gravatar.com/avatar/40b8a76ccad69f24259200911d760abe?s=160" alt="Profile Picture" style="width: 160px;" />
+	
+</div>
+<hgroup>
+  <h1><a href="/">Alex's Blog</a></h1>
+  
+</hgroup>
+
+<nav id="main-nav"><section class="about-me">
+  <p>Web developer from Birmingham, UK working at <a href="http://clevercherry.com/">clevercherry</a>.</p>
+  <p>The opinions in this blog are my own naïve idealistic opinions and not the opinions of my employer.</p>
+</section>
+
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/laravel-cheat-sheet/">Laravel Cheat Sheet</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+<nav id="sub-nav">
+	<div class="social">
+		
+		
+		
+		
+			<a class="twitter" href="http://twitter.com/alexrussell101" title="Twitter">Twitter</a>
+		
+		
+			<a class="github" href="https://github.com/alexrussell" title="GitHub">GitHub</a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+			<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+</nav>
+</header>				
+			</div>
+		</div>	
+		<div class="mid-col">
+			
+				
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+	<h1 class="title" itemprop="name">Laravel Digest (November 2013)</h1>
+	<div class="entry-content" itemprop="articleBody"><p>Welcome to the third instalment of Laravel Digest, the series where I give a regular rundown of important changes, fixes and additions to Laravel&rsquo;s master branch. Below are the changes up to the end of November 2013:</p>
+
+<ul>
+<li>Relationships can now reference any key on the parent model using a new last parameter for each of the <code>\Eloquent\Model</code> methods (<code>belongsTo</code>: <a href="https://github.com/laravel/framework/commit/c7d2740404251d9e08a24eacbbc42812b038fbaa"><code>c7d2740</code></a>, <code>hasOne</code>, <code>hasMany</code>, morph relationships: <a href="https://github.com/laravel/framework/commit/a634f4a634f457860c8ac7c091da4912351dcdc29562c15"><code>a634f45</code></a>):</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">User</span> <span class="k">extends</span> <span class="nx">Eloquent</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="c1">// belongsTo</span>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">group</span><span class="p">()</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">belongsTo</span><span class="p">(</span><span class="s1">&#39;Group&#39;</span><span class="p">,</span> <span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// hasOne</span>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">city</span><span class="p">()</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">hasOne</span><span class="p">(</span><span class="s1">&#39;City&#39;</span><span class="p">,</span> <span class="s1">&#39;city&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// hasMany</span>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">roles</span><span class="p">()</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">hasMany</span><span class="p">(</span><span class="s1">&#39;Role&#39;</span><span class="p">,</span> <span class="s1">&#39;role&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// etc...</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><p><code>Builder#has</code> method now maintains a query&rsquo;s constraints (<a href="https://github.com/laravel/framework/commit/7196279d1f6c5a9e067beb6f39fea5eaa50e7c19"><code>7196279</code></a>)</p></li>
+<li><p>Scoped queries now return the value from the scope method for better chaining (<a href="https://github.com/laravel/framework/commit/23adaa4068ad91fd934b58b6f60cef06135a76e3"><code>23adaa4</code></a>)</p>
+
+<ul>
+<li>In case you&rsquo;re confused how this is new functionality (I was), previously, the magic method that called your custom scope method ignored what you returned and instead returned the <code>Builder</code> instance (which to be honest is the 95%+ use case anyway), but it now returns what you actually return from your scope method (so if you weren&rsquo;t already, make sure you return the <code>Builder</code> instance!)</li>
+</ul>
+</li>
+<li><p><code>has</code> queries got even better: new <code>whereHas()</code> and <code>orWhereHas()</code> that allow you to set specific constraints on the <code>has</code> relation (<a href="https://github.com/laravel/framework/commit/a634f45"><code>a634f45</code></a>):</p></li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="c1">// get all users with posts pre-attached, but only users with</span>
+</span><span class='line'><span class="c1">// at least one post that is more than a year old</span>
+</span><span class='line'><span class="nx">User</span><span class="o">::</span><span class="na">with</span><span class="p">(</span><span class="s1">&#39;posts&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">whereHas</span><span class="p">(</span><span class="s1">&#39;posts&#39;</span><span class="p">,</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$query</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="s1">&#39;created_at&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="nx">Carbon</span><span class="o">::</span><span class="na">now</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">subYears</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+</span><span class='line'><span class="p">})</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I&rsquo;m not sure right now if the <code>whereHas</code> affects the <code>with</code> (i.e. what actually gets returned pre-attached) or just the mechanism for filtering the original model by the relationship. My guess is the latter.</p>
+
+<ul>
+<li><p>New session configuration option <code>secure</code> (boolean) that will affect whether the session cookie gets sent via HTTPS only or not (<a href="https://github.com/laravel/framework/commit/37fa9a1c599069ea475e75cd540b9239f76ecc71"><code>37fa9a1</code></a> and [<code>laravel/laravel@f387853</code>](<a href="https://github.com/laravel/laravel/commit/">https://github.com/laravel/laravel/commit/</a></p></li>
+<li><p>New short variable defaults in Eloquent (<a href="https://github.com/laravel/framework/commit/10f5bfae60a799b1f7862cb923e7cf2ecd086816"><code>10f5bfa</code></a>)</p></li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="c">&lt;!-- this --&gt;</span>
+</span><span class='line'><span class="nt">&lt;div&gt;</span>Hello, {{ isset($username) ? $username : &#39;anonymous&#39; }}.<span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="c">&lt;!-- can now be done like this --&gt;</span>
+</span><span class='line'><span class="nt">&lt;div&gt;</span>Hello, {{ $username or &#39;anonymous&#39; }}.<span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><p>Cache entries can now be tagged. New functionality includes using <code>Cache::tags</code> to get a list of the tags used in the cache, and items can be flushed by tag (<a href="https://github.com/laravel/framework/commit/70108fe4f456f343325234063aa77b9012ede7dd"><code>70108fe</code></a>)</p></li>
+<li><p>Laravel now sends <code>X-frame-Options: SAMEORIGIN</code> by default in the HTTP headers (<a href="https://github.com/laravel/framework/commit/15513cc96790e33b7a136db381b06805863d3009"><code>15513cc</code></a>)</p></li>
+<li><p><code>belongsToMany</code> relations now have a firstOrFail method (<a href="https://github.com/laravel/framework/commit/b162579b3911f59f5ca175d2d90d0a221cf6b109"><code>b162579</code></a>)</p></li>
+<li><p>Schema builder now has <code>nullableTimestamps</code> method that creates timestamps as normal but makes them nullable fields (<a href="https://github.com/laravel/framework/commit/a44fbab722c276fca0b09d7a22e446b7894bee93"><code>a44fbab</code></a>)</p></li>
+<li><p>Joins can now have complex conditions if <code>joinWhere</code> or <code>leftJoinWhere</code> are used (<a href="https://github.com/laravel/framework/commit/a644ea01fc3110b29a8f3a9ac96e039b3478953c"><code>a644ea0</code></a>)</p></li>
+<li><p>New <code>required_without_all</code> validation rule that works like <code>required_without</code> but checks that at least one of the specified fields is present rather than all fields (<a href="https://github.com/laravel/framework/commit/93c1045fdea4d115d4a9dbc7ae64793bc7063d52"><code>93c1045</code></a>)</p></li>
+<li><p>Original method that was attempted is passed to <code>Controller#missingMethod</code> now as the first parameter, with the additional parameters as an array as the second parameter (<a href="https://github.com/laravel/framework/commit/de871fe7db2798071e8ca877d04ba7e6629f9f18"><code>de871fe</code></a>)</p></li>
+<li><p>New Blade <code>@append</code> method (<a href="https://github.com/laravel/framework/commit/f0ae98bfd0b07be739eaf9b9bf3505e916d25ca7"><code>f0ae98b</code></a>):</p></li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>@section(&#39;content&#39;)
+</span><span class='line'>Some content for the content section
+</span><span class='line'>@append
+</span><span class='line'>
+</span><span class='line'>...
+</span><span class='line'>
+</span><span class='line'>@section(&#39;content&#39;)
+</span><span class='line'>Some more content for the content section
+</span><span class='line'>@append
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><p>New query builder <code>rememberForever</code> method (<a href="https://github.com/laravel/framework/commit/c6815845956e1cbd7039cefe67157ff0b3e8c557"><code>c681584</code></a>)</p></li>
+<li><p>New Eloquent model <code>booting</code> and <code>booted</code> methods (<a href="https://github.com/laravel/framework/commit/2dfb3831d62f4689b9e234a83af46551df273609"><code>2dfb383</code></a>)</p></li>
+<li><p><code>View#withErrors</code> now accepts an optional parameter that is a object that implements <code>MessageProviderInterface</code> (i.e. can be asked for a <code>MessageBag</code>)(<a href="https://github.com/laravel/framework/commit/3c5ca1a85dce7fc915c19b3cd197ad03433375b6"><code>3c5ca1a</code></a>)</p>
+
+<ul>
+<li>Use case here is for validators: <code>View::make('some.view')-&gt;withErrors($validator);</code></li>
+</ul>
+</li>
+<li><p>A big change to password resetting/reminder stuff (<a href="https://github.com/laravel/framework/commit/f86d5ea61f6adc2004b8ed259a62cc8008d08fd0"><code>f86d5ea</code></a>)</p>
+
+<ul>
+<li><a href="https://github.com/laravel/docs/blob/master/security.md">Related documentation (may not yet be complete)</a></li>
+</ul>
+</li>
+<li><p><code>Collection#splice</code> now returns the extracted elements (if any) as a new <code>Collection</code> (<a href="https://github.com/laravel/framework/commit/32f107dae8c052cc012c272e4d2b2f278b86aade"><code>32f107d</code></a>)</p></li>
+<li><p>Commas are now allowed in route wildcards (<a href="https://github.com/laravel/framework/commit/fdd378bb072d6993be9798aa1772c394e65e5048"><code>fdd378b</code></a>)</p></li>
+<li><p>Using host detection in <code>bootstrap/start.php</code> you should now just use the machine name rather than HTTP_HOST, this change is good because it bridges artisan and HTTP environment detection (<a href="https://github.com/laravel/laravel/commit/a297fe838946f1412e61647797df78eb5b24b267"><code>laravel/laravel@a297fe8</code></a>)</p></li>
+<li><p>On a <code>BelongsToMany</code> relationship, you can now use <code>wherePivot</code> and <code>orWherePivot</code> to add constraints to the pivot table conveniently (<a href="https://github.com/laravel/framework/commit/5d485777847b5641101af68660b925e2cab30ec3"><code>5d48577</code></a>)</p></li>
+<li><p>Database layer can now have separate connections for reading and writing. I&rsquo;m not entirely sure why this was added but maybe it&rsquo;s useful to some (<a href="https://github.com/laravel/framework/commit/a3b0e87ae50b22a517c6daea85e824ae2f0e27c0"><code>a3b0e87</code></a>). As I understand it from the tests, you can just override any settings from the connection&rsquo;s config array in the <code>read</code> or <code>write</code> keys:</p></li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// app/config/database.php</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>    <span class="c1">// ...</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="s1">&#39;connections&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>        <span class="s1">&#39;mysql&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">// default settings for read/write for this connection</span>
+</span><span class='line'>            <span class="s1">&#39;driver&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;mysql&#39;</span><span class="p">,</span>
+</span><span class='line'>            <span class="s1">&#39;host&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span>
+</span><span class='line'>            <span class="s1">&#39;database&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;laravel&#39;</span><span class="p">,</span>
+</span><span class='line'>            <span class="s1">&#39;username&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span>
+</span><span class='line'>            <span class="s1">&#39;password&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;pass&#39;</span><span class="p">,</span>
+</span><span class='line'>            <span class="s1">&#39;charset&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;utf8&#39;</span><span class="p">,</span>
+</span><span class='line'>            <span class="s1">&#39;collation&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;utf8_unicode_ci&#39;</span><span class="p">,</span>
+</span><span class='line'>            <span class="s1">&#39;prefix&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">// read-specific overrides</span>
+</span><span class='line'>            <span class="s1">&#39;read&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>                <span class="s1">&#39;database&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;laravel_read&#39;</span><span class="p">,</span>
+</span><span class='line'>            <span class="p">),</span>
+</span><span class='line'>        <span class="p">),</span>
+</span><span class='line'>    <span class="p">),</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><p>Lots of work on queues (in particular releasing jobs back to the queue for Iron.io queues, as well as logging failed queue jobs into a database connection) (multiple commits).</p></li>
+<li><p><code>Collection</code> class now has <code>merge</code>, <code>diff</code> and <code>intersect</code> methods to work with multiple collections (<a href="https://github.com/laravel/framework/commit/2f5402411717232f9cb9bacfd0bc3aee4f353716"><code>2f54024</code></a>).</p></li>
+<li><p><code>Paginator</code> has a new method <code>fragment</code> which can be used to set the fragment to be appended to the URIs generated by the paginator (if passed a string) or get the current fragment (if the argument is omitted or null) (<a href="https://github.com/laravel/framework/commit/ea9a92483479155b393462f2a2bcbb4a2c246fff"><code>ea9a924</code></a>):</p></li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$paginator</span><span class="o">-&gt;</span><span class="na">fragment</span><span class="p">(</span><span class="s1">&#39;my-frag&#39;</span><span class="p">);</span> <span class="c1">// sets the fragment to be &#39;my-frag&#39;</span>
+</span><span class='line'><span class="k">echo</span> <span class="nv">$paginator</span><span class="o">-&gt;</span><span class="na">fragment</span><span class="p">();</span> <span class="c1">// echoes the current fragment (i.e. &#39;my-frag&#39;)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Eloquent&rsquo;s <code>Collection#find</code> can now accept a model as the &lsquo;key&rsquo; and it&rsquo;ll search in the collection for a model which has the same key as the passed model (<a href="https://github.com/laravel/framework/commit/362db89e635eda87faf8c0db0935e3fe0d74f5bf"><code>362db89</code></a>):</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// get all enabled pages</span>
+</span><span class='line'><span class="nv">$pages</span> <span class="o">=</span> <span class="nx">Page</span><span class="o">::</span><span class="na">whereEnabled</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// get page with id of 1</span>
+</span><span class='line'><span class="nv">$page</span>  <span class="o">=</span> <span class="nx">Page</span><span class="o">::</span><span class="na">find</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// before:</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$pages</span><span class="o">-&gt;</span><span class="na">contains</span><span class="p">(</span><span class="nv">$page</span><span class="o">-&gt;</span><span class="na">getKey</span><span class="p">()))</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// do something</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// now:</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$pages</span><span class="o">-&gt;</span><span class="na">contains</span><span class="p">(</span><span class="nv">$page</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// do something</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Locking added to <code>QueryBuilder</code> (<a href="https://github.com/laravel/framework/commit/a33143257d9bed8c81065ebc6513e3cca7d3f124"><code>a331432</code></a>):
+
+<ul>
+<li><code>$builder-&gt;lockForUpdate()</code> &ndash; same as calling <code>$builder-&gt;lock(true)</code></li>
+<li><code>$builder-&gt;sharedLock()</code> &ndash; same as calling <code>$builder-&gt;lock(false)</code></li>
+<li><code>$builder-&gt;lock([string|boolean])</code>
+
+<ul>
+<li>If <code>true</code>, signifies the row should be locked for update</li>
+<li>If <code>false</code>, signifies that the row should be locked for share</li>
+<li>If a string, the string will be used as the text to go in the &lsquo;lock&rsquo; part of the query</li>
+</ul>
+</li>
+<li>It would appear that even if you don&rsquo;t do anything to do with locks, you will now always get the shared lock due to the way the lock variable is handled, but maybe I&rsquo;m wrong there, or maybe that&rsquo;s implicit in RDBMSes anyway so it doesn&rsquo;t harm anyone</li>
+</ul>
+</li>
+</ul>
+
+</div>
+
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+
+</div>
+			</div>
+			<footer id="footer" class="inner"><p>
+  Copyright &copy; 2013 - Alex Russell -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+Design credit: <a href="http://shashankmehta.in/archive/2012/greyshade.html">Shashank Mehta</a></footer>
+			
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+		</div>
+	</div>
+</body>
+</html>

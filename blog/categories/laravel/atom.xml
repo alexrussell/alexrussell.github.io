@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Laravel | Alex's Blog]]></title>
   <link href="http://alexrussell.me.uk/blog/categories/laravel/atom.xml" rel="self"/>
   <link href="http://alexrussell.me.uk/"/>
-  <updated>2013-11-04T13:47:35+00:00</updated>
+  <updated>2013-12-03T11:09:33+00:00</updated>
   <id>http://alexrussell.me.uk/</id>
   <author>
     <name><![CDATA[Alex Russell]]></name>
@@ -12,6 +12,245 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Laravel Digest (November 2013)]]></title>
+    <link href="http://alexrussell.me.uk/blog/2013/12/laravel-digest-november-2013/"/>
+    <updated>2013-12-01T10:00:00+00:00</updated>
+    <id>http://alexrussell.me.uk/blog/2013/12/laravel-digest-november-2013</id>
+    <content type="html"><![CDATA[<p>Welcome to the third instalment of Laravel Digest, the series where I give a regular rundown of important changes, fixes and additions to Laravel&rsquo;s master branch. Below are the changes up to the end of November 2013:</p>
+
+<ul>
+<li>Relationships can now reference any key on the parent model using a new last parameter for each of the <code>\Eloquent\Model</code> methods (<code>belongsTo</code>: <a href="https://github.com/laravel/framework/commit/c7d2740404251d9e08a24eacbbc42812b038fbaa"><code>c7d2740</code></a>, <code>hasOne</code>, <code>hasMany</code>, morph relationships: <a href="https://github.com/laravel/framework/commit/a634f4a634f457860c8ac7c091da4912351dcdc29562c15"><code>a634f45</code></a>):</li>
+</ul>
+
+
+<p>``` php
+&lt;?php</p>
+
+<p>class User extends Eloquent
+{</p>
+
+<pre><code>// belongsTo
+public function group()
+{
+    return $this-&gt;belongsTo('Group', 'group', 'name');
+}
+
+// hasOne
+public function city()
+{
+    return $this-&gt;hasOne('City', 'city', 'name');
+}
+
+// hasMany
+public function roles()
+{
+    return $this-&gt;hasMany('Role', 'role', 'type');
+}
+
+// etc...
+</code></pre>
+
+<p>}
+```</p>
+
+<ul>
+<li><p><code>Builder#has</code> method now maintains a query&rsquo;s constraints (<a href="https://github.com/laravel/framework/commit/7196279d1f6c5a9e067beb6f39fea5eaa50e7c19"><code>7196279</code></a>)</p></li>
+<li><p>Scoped queries now return the value from the scope method for better chaining (<a href="https://github.com/laravel/framework/commit/23adaa4068ad91fd934b58b6f60cef06135a76e3"><code>23adaa4</code></a>)</p>
+
+<ul>
+<li>In case you&rsquo;re confused how this is new functionality (I was), previously, the magic method that called your custom scope method ignored what you returned and instead returned the <code>Builder</code> instance (which to be honest is the 95%+ use case anyway), but it now returns what you actually return from your scope method (so if you weren&rsquo;t already, make sure you return the <code>Builder</code> instance!)</li>
+</ul>
+</li>
+<li><p><code>has</code> queries got even better: new <code>whereHas()</code> and <code>orWhereHas()</code> that allow you to set specific constraints on the <code>has</code> relation (<a href="https://github.com/laravel/framework/commit/a634f45"><code>a634f45</code></a>):</p></li>
+</ul>
+
+
+<p>``` php
+&lt;?php
+// get all users with posts pre-attached, but only users with
+// at least one post that is more than a year old
+User::with(&lsquo;posts&rsquo;)&ndash;>whereHas(&lsquo;posts&rsquo;, function ($query) {</p>
+
+<pre><code>$query-&gt;where('created_at', '&lt;', Carbon::now()-&gt;subYears(1));
+</code></pre>
+
+<p>})&ndash;>get();
+```</p>
+
+<p>I&rsquo;m not sure right now if the <code>whereHas</code> affects the <code>with</code> (i.e. what actually gets returned pre-attached) or just the mechanism for filtering the original model by the relationship. My guess is the latter.</p>
+
+<ul>
+<li><p>New session configuration option <code>secure</code> (boolean) that will affect whether the session cookie gets sent via HTTPS only or not (<a href="https://github.com/laravel/framework/commit/37fa9a1c599069ea475e75cd540b9239f76ecc71"><code>37fa9a1</code></a> and [<code>laravel/laravel@f387853</code>](<a href="https://github.com/laravel/laravel/commit/">https://github.com/laravel/laravel/commit/</a></p></li>
+<li><p>New short variable defaults in Eloquent (<a href="https://github.com/laravel/framework/commit/10f5bfae60a799b1f7862cb923e7cf2ecd086816"><code>10f5bfa</code></a>)</p></li>
+</ul>
+
+
+<p>``` html</p>
+
+<!-- this -->
+
+
+<div>Hello, {{ isset($username) ? $username : 'anonymous' }}.</div>
+
+
+<!-- can now be done like this -->
+
+
+<div>Hello, {{ $username or 'anonymous' }}.</div>
+
+
+<p>```</p>
+
+<ul>
+<li><p>Cache entries can now be tagged. New functionality includes using <code>Cache::tags</code> to get a list of the tags used in the cache, and items can be flushed by tag (<a href="https://github.com/laravel/framework/commit/70108fe4f456f343325234063aa77b9012ede7dd"><code>70108fe</code></a>)</p></li>
+<li><p>Laravel now sends <code>X-frame-Options: SAMEORIGIN</code> by default in the HTTP headers (<a href="https://github.com/laravel/framework/commit/15513cc96790e33b7a136db381b06805863d3009"><code>15513cc</code></a>)</p></li>
+<li><p><code>belongsToMany</code> relations now have a firstOrFail method (<a href="https://github.com/laravel/framework/commit/b162579b3911f59f5ca175d2d90d0a221cf6b109"><code>b162579</code></a>)</p></li>
+<li><p>Schema builder now has <code>nullableTimestamps</code> method that creates timestamps as normal but makes them nullable fields (<a href="https://github.com/laravel/framework/commit/a44fbab722c276fca0b09d7a22e446b7894bee93"><code>a44fbab</code></a>)</p></li>
+<li><p>Joins can now have complex conditions if <code>joinWhere</code> or <code>leftJoinWhere</code> are used (<a href="https://github.com/laravel/framework/commit/a644ea01fc3110b29a8f3a9ac96e039b3478953c"><code>a644ea0</code></a>)</p></li>
+<li><p>New <code>required_without_all</code> validation rule that works like <code>required_without</code> but checks that at least one of the specified fields is present rather than all fields (<a href="https://github.com/laravel/framework/commit/93c1045fdea4d115d4a9dbc7ae64793bc7063d52"><code>93c1045</code></a>)</p></li>
+<li><p>Original method that was attempted is passed to <code>Controller#missingMethod</code> now as the first parameter, with the additional parameters as an array as the second parameter (<a href="https://github.com/laravel/framework/commit/de871fe7db2798071e8ca877d04ba7e6629f9f18"><code>de871fe</code></a>)</p></li>
+<li><p>New Blade <code>@append</code> method (<a href="https://github.com/laravel/framework/commit/f0ae98bfd0b07be739eaf9b9bf3505e916d25ca7"><code>f0ae98b</code></a>):</p></li>
+</ul>
+
+
+<p>``` html
+@section(&lsquo;content&rsquo;)
+Some content for the content section
+@append</p>
+
+<p>&hellip;</p>
+
+<p>@section(&lsquo;content&rsquo;)
+Some more content for the content section
+@append
+```</p>
+
+<ul>
+<li><p>New query builder <code>rememberForever</code> method (<a href="https://github.com/laravel/framework/commit/c6815845956e1cbd7039cefe67157ff0b3e8c557"><code>c681584</code></a>)</p></li>
+<li><p>New Eloquent model <code>booting</code> and <code>booted</code> methods (<a href="https://github.com/laravel/framework/commit/2dfb3831d62f4689b9e234a83af46551df273609"><code>2dfb383</code></a>)</p></li>
+<li><p><code>View#withErrors</code> now accepts an optional parameter that is a object that implements <code>MessageProviderInterface</code> (i.e. can be asked for a <code>MessageBag</code>)(<a href="https://github.com/laravel/framework/commit/3c5ca1a85dce7fc915c19b3cd197ad03433375b6"><code>3c5ca1a</code></a>)</p>
+
+<ul>
+<li>Use case here is for validators: <code>View::make('some.view')-&gt;withErrors($validator);</code></li>
+</ul>
+</li>
+<li><p>A big change to password resetting/reminder stuff (<a href="https://github.com/laravel/framework/commit/f86d5ea61f6adc2004b8ed259a62cc8008d08fd0"><code>f86d5ea</code></a>)</p>
+
+<ul>
+<li><a href="https://github.com/laravel/docs/blob/master/security.md">Related documentation (may not yet be complete)</a></li>
+</ul>
+</li>
+<li><p><code>Collection#splice</code> now returns the extracted elements (if any) as a new <code>Collection</code> (<a href="https://github.com/laravel/framework/commit/32f107dae8c052cc012c272e4d2b2f278b86aade"><code>32f107d</code></a>)</p></li>
+<li><p>Commas are now allowed in route wildcards (<a href="https://github.com/laravel/framework/commit/fdd378bb072d6993be9798aa1772c394e65e5048"><code>fdd378b</code></a>)</p></li>
+<li><p>Using host detection in <code>bootstrap/start.php</code> you should now just use the machine name rather than HTTP_HOST, this change is good because it bridges artisan and HTTP environment detection (<a href="https://github.com/laravel/laravel/commit/a297fe838946f1412e61647797df78eb5b24b267"><code>laravel/laravel@a297fe8</code></a>)</p></li>
+<li><p>On a <code>BelongsToMany</code> relationship, you can now use <code>wherePivot</code> and <code>orWherePivot</code> to add constraints to the pivot table conveniently (<a href="https://github.com/laravel/framework/commit/5d485777847b5641101af68660b925e2cab30ec3"><code>5d48577</code></a>)</p></li>
+<li><p>Database layer can now have separate connections for reading and writing. I&rsquo;m not entirely sure why this was added but maybe it&rsquo;s useful to some (<a href="https://github.com/laravel/framework/commit/a3b0e87ae50b22a517c6daea85e824ae2f0e27c0"><code>a3b0e87</code></a>). As I understand it from the tests, you can just override any settings from the connection&rsquo;s config array in the <code>read</code> or <code>write</code> keys:</p></li>
+</ul>
+
+
+<p>``` php
+&lt;?php</p>
+
+<p>// app/config/database.php</p>
+
+<p>return array(</p>
+
+<pre><code>// ...
+
+'connections' =&gt; array(
+    'mysql' =&gt; array(
+
+        // default settings for read/write for this connection
+        'driver'    =&gt; 'mysql',
+        'host'      =&gt; '127.0.0.1',
+        'database'  =&gt; 'laravel',
+        'username'  =&gt; 'user',
+        'password'  =&gt; 'pass',
+        'charset'   =&gt; 'utf8',
+        'collation' =&gt; 'utf8_unicode_ci',
+        'prefix'    =&gt; '',
+
+        // read-specific overrides
+        'read' =&gt; array(
+            'database' =&gt; 'laravel_read',
+        ),
+    ),
+),
+</code></pre>
+
+<p>);</p>
+
+<p>```</p>
+
+<ul>
+<li><p>Lots of work on queues (in particular releasing jobs back to the queue for Iron.io queues, as well as logging failed queue jobs into a database connection) (multiple commits).</p></li>
+<li><p><code>Collection</code> class now has <code>merge</code>, <code>diff</code> and <code>intersect</code> methods to work with multiple collections (<a href="https://github.com/laravel/framework/commit/2f5402411717232f9cb9bacfd0bc3aee4f353716"><code>2f54024</code></a>).</p></li>
+<li><p><code>Paginator</code> has a new method <code>fragment</code> which can be used to set the fragment to be appended to the URIs generated by the paginator (if passed a string) or get the current fragment (if the argument is omitted or null) (<a href="https://github.com/laravel/framework/commit/ea9a92483479155b393462f2a2bcbb4a2c246fff"><code>ea9a924</code></a>):</p></li>
+</ul>
+
+
+<p>``` php
+&lt;?php</p>
+
+<p>$paginator->fragment(&lsquo;my-frag&rsquo;); // sets the fragment to be &lsquo;my-frag&rsquo;
+echo $paginator->fragment(); // echoes the current fragment (i.e. &lsquo;my-frag&rsquo;)
+```</p>
+
+<ul>
+<li>Eloquent&rsquo;s <code>Collection#find</code> can now accept a model as the &lsquo;key&rsquo; and it&rsquo;ll search in the collection for a model which has the same key as the passed model (<a href="https://github.com/laravel/framework/commit/362db89e635eda87faf8c0db0935e3fe0d74f5bf"><code>362db89</code></a>):</li>
+</ul>
+
+
+<p>``` php
+&lt;?php</p>
+
+<p>// get all enabled pages
+$pages = Page::whereEnabled(1)&ndash;>get();</p>
+
+<p>// get page with id of 1
+$page  = Page::find(1);</p>
+
+<p>// before:
+if ($pages->contains($page->getKey())) {</p>
+
+<pre><code>// do something
+</code></pre>
+
+<p>}</p>
+
+<p>// now:
+if ($pages->contains($page)) {</p>
+
+<pre><code>// do something
+</code></pre>
+
+<p>}</p>
+
+<p>```</p>
+
+<ul>
+<li>Locking added to <code>QueryBuilder</code> (<a href="https://github.com/laravel/framework/commit/a33143257d9bed8c81065ebc6513e3cca7d3f124"><code>a331432</code></a>):
+
+<ul>
+<li><code>$builder-&gt;lockForUpdate()</code> &ndash; same as calling <code>$builder-&gt;lock(true)</code></li>
+<li><code>$builder-&gt;sharedLock()</code> &ndash; same as calling <code>$builder-&gt;lock(false)</code></li>
+<li><code>$builder-&gt;lock([string|boolean])</code>
+
+<ul>
+<li>If <code>true</code>, signifies the row should be locked for update</li>
+<li>If <code>false</code>, signifies that the row should be locked for share</li>
+<li>If a string, the string will be used as the text to go in the &lsquo;lock&rsquo; part of the query</li>
+</ul>
+</li>
+<li>It would appear that even if you don&rsquo;t do anything to do with locks, you will now always get the shared lock due to the way the lock variable is handled, but maybe I&rsquo;m wrong there, or maybe that&rsquo;s implicit in RDBMSes anyway so it doesn&rsquo;t harm anyone</li>
+</ul>
+</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Laravel Digest (October 2013)]]></title>
