@@ -6,6 +6,29 @@ comments: false
 sharing: true
 footer: true
 ---
+
+## Contents
+
+- [IoC Usage](#ioc)
+    - [Bind](#ioc-bind)
+    - [Singleton](#ioc-singleton)
+    - [Share](#ioc-share)
+    - [Extend](#ioc-extend)
+    - [Instance](#ioc-instance)
+    - [Alias](#ioc-alias)
+    - [Make](#ioc-make)
+- [URL Generation](#urls)
+- [Service Providers](#service-providers)
+- [Eloquent](#eloquent)
+    - [Relationships](#eloquent-relationships)
+    - [Fetching](#eloquent-fetching)
+    - [Nested Wheres](#eloquent-nested-wheres)
+    - [Boot Method](#eloquent-boot)
+- [Routing](#routing)
+- [Views](#views)
+
+
+<div id="ioc"></div>
 ## IoC Usage
 
 In general, where these methods take closures, the closure will act as they should. For example, `App::singleton()`'s closure is immediately invoked to get the instance to be used every time make is called.
@@ -54,6 +77,7 @@ In general, where these methods take closures, the closure will act as they shou
     Upon getting, internally App::make is called on the key passed in.
     Upon setting, internally App::bind is called, an the value passed in is converted to a closure if it is not already one
 
+<div id="ioc-bind"></div>
 ### bind
 
 `App::bind($abstract, $concrete, $shared)`
@@ -77,6 +101,7 @@ class SomeController {
 }
 ```
 
+<div id="ioc-singleton"></div>
 ### singleton
 
 `App::singleton($abstract, $concrete)`
@@ -85,6 +110,7 @@ In effect this adds `$abstract` as a key to the container with the value of `$co
 
 If `$concrete` is a closure, it is evaluated lazily when the first instance is requested with `make` and then stored in `$app->instances` for future reference.
 
+<div id="ioc-share"></div>
 ### share
 
 `App::share($closure)`
@@ -93,6 +119,7 @@ It does this by wrapping it in a new closure that, the first time it runs, runs 
 
 Share doesn't store anything in the IoC container, and just returns a closure. Make sure you use it with another IoC feature (most people go for `$app['my.feature'] = $app->share(/* closure */)`).
 
+<div id="ioc-extend"></div>
 ### extend
 
 `App::extend($abstract, $closure)`
@@ -101,6 +128,7 @@ Extend a binding with an outer wrapping closure. When the binding is resolved us
 
 Presumably this could be used for overriding dependency injection or setting additional dependencies using `$model->setInterface($concrete)` kinda thing.
 
+<div id="ioc-instance"></div>
 ### instance
 
 `App::instance($abstract, $instance)`
@@ -123,6 +151,8 @@ class SomeController {
     }
 }
 ```
+
+<div id="ioc-alias"></div>
 ### alias
 
 `App::alias($abstract, $alias)`
@@ -131,6 +161,7 @@ Allows you to alias a fully-qualified type to a shorter version. So you can alia
 
 This function does not actually store any bindings - just the fact that something called `$abstract` in the IoC container can be found by asking for `$alias`. It's also naïve in that you can pass anything in and it does no checking. Presumably the eventual call to `make` will do the checking that something *can* be resolved.
 
+<div id="ioc-make"></div>
 ### make
 
 `App::make($abstract[, $parameters = array()])`
@@ -149,7 +180,7 @@ This could go all sorts of ways depending on how the binding is set up, but basi
 
 This appears to be the backbone of the IoC – at a guess, whenever Laravel needs to resolve anything (through either an explicit call to `App::make()` or typehints) it'll use this. In turn, this uses the various registration methods outlined above.
 
-
+<div id="urls"></div>
 ## URL Generation
 
 ### `URL::current()`
@@ -228,7 +259,7 @@ Generates an HTML anchor linking to the named route (see `URL::route()`)
 
 Generates an HTML anchor linking to the action (see `URL::action()`)
 
-
+<div id="service-providers"></div>
 ## Service Providers
 
 The `register` method of a service provider is called first. This method should do very little – simply add any bindings to the IoC container. The reason being that all service providers will be initialised (using `register`) in order, so a given service provider cannot guarantee that a service provider it may rely on is initialised yet, and thus cannot use it.
@@ -258,9 +289,10 @@ There are various parts of putting together a package and its (main) service pro
 
 Also not discussed in the documentation is that a package's views can be overridden like its config can. To override the config, `artisan config:publish vendor/package` can be called, which under the hood copies the package's `<package_root>/config/*` files to `app/config/packages/<vendor>/<package>/*`. There is now ([all thanks to me](https://github.com/laravel/framework/pull/2364)) also a corresponding `artisan` command for publishing views: just use `artisan view:publish vendor/package`. **Do be careful with this though!**
 
-
+<div id="eloquent"></div>
 ## Eloquent Models
 
+<div id="eloquent-relationships"></div>
 ### Relationships
 
 A default belongsToMany relationship will look for the table references by concatenating the two tables in question, both singular and listed in alphabetical order, with an underscore in between.
@@ -350,6 +382,7 @@ $post->tags()->detach();
 
 * Actually `attach` and `detach` can accept instances of `Eloquent\Model` but only if you're attaching or detaching one - they cannot be used if arrays are passed
 
+<div id="eloquent-fetching"></div>
 ### Fetching
 
 Using Eloquent with `where`, `orWhere`, `take`, etc. uses the query builder. Once a query is complete and you need to get the actual collection of models the following methods are available:
@@ -362,6 +395,7 @@ Using Eloquent with `where`, `orWhere`, `take`, etc. uses the query builder. Onc
 - `Model::distinct($field)->lists($field)` is a much more useful version of the above line - it'll strip duplicate field values and then return them in an array
 - `Model::toSql()` is useful for debugging - return the current query as an SQL string to be executed
 
+<div id="eloquent-nested-wheres"></div>
 ### Nested Wheres
 
 A few examples of converting SQL to Eloquent/Fluent query builder calls, as it's slightly counter-intuitive:
@@ -380,6 +414,7 @@ Model::where(/* x */)->orWhere(function ($query) {
 });
 ```
 
+<div id="eloquent-boot"></div>
 ### Boot method
 
 Like service providers, eloquent models have a `boot` method. This method is like a static constructor (as far as I can tell) in that it will only be called once, but it is also lazily-executed: it gets called the first time a model is instantiated. If a model should register its own event listeners, then it should be done here.
@@ -411,6 +446,7 @@ class Post extends Eloquent
 }
 ```
 
+<div id="routing"></div>
 ## Routing
 
 Just some more detail on the less-discussed commands:
@@ -466,6 +502,7 @@ Just some more detail on the less-discussed commands:
 
     This method is only useful for setting up routing for an API really.
 
+<div id="views"></div>
 ## The View class
 
 - `View::share()`
