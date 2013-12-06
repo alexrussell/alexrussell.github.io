@@ -9,7 +9,17 @@
 	<meta name="author" content="Alex Russell">
 
 	
-	<meta name="description" content="IoC Usage In general, where these methods take closures, the closure will act as they should. For example, App::singleton()&rsquo;s closure is &hellip;">
+	<meta name="description" content="Contents IoC Usage Bind
+Singleton
+Share
+Extend
+Instance
+Alias
+Make URL Generation
+Service Providers
+Eloquent Relationships
+Fetching
+Nested Wheres &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -108,7 +118,41 @@
     
     <h1 class="title">Laravel Cheat Sheet</h1>
     
-    <div class="entry-content"><h2>IoC Usage</h2>
+    <div class="entry-content"><h2>Contents</h2>
+
+<ul>
+<li><a href="#ioc">IoC Usage</a>
+
+<ul>
+<li><a href="#ioc-bind">Bind</a></li>
+<li><a href="#ioc-singleton">Singleton</a></li>
+<li><a href="#ioc-share">Share</a></li>
+<li><a href="#ioc-extend">Extend</a></li>
+<li><a href="#ioc-instance">Instance</a></li>
+<li><a href="#ioc-alias">Alias</a></li>
+<li><a href="#ioc-make">Make</a></li>
+</ul>
+</li>
+<li><a href="#urls">URL Generation</a></li>
+<li><a href="#service-providers">Service Providers</a></li>
+<li><a href="#eloquent">Eloquent</a>
+
+<ul>
+<li><a href="#eloquent-relationships">Relationships</a></li>
+<li><a href="#eloquent-fetching">Fetching</a></li>
+<li><a href="#eloquent-nested-wheres">Nested Wheres</a></li>
+<li><a href="#eloquent-boot">Boot Method</a></li>
+</ul>
+</li>
+<li><a href="#routing">Routing</a></li>
+<li><a href="#views">Views</a></li>
+</ul>
+
+
+<div id="ioc"></div>
+
+
+<h2>IoC Usage</h2>
 
 <p>In general, where these methods take closures, the closure will act as they should. For example, <code>App::singleton()</code>&rsquo;s closure is immediately invoked to get the instance to be used every time make is called.</p>
 
@@ -151,6 +195,9 @@
 </ul>
 
 
+<div id="ioc-bind"></div>
+
+
 <h3>bind</h3>
 
 <p><code>App::bind($abstract, $concrete, $shared)</code></p>
@@ -186,6 +233,11 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
+
+
+<div id="ioc-singleton"></div>
+
+
 <h3>singleton</h3>
 
 <p><code>App::singleton($abstract, $concrete)</code></p>
@@ -193,6 +245,9 @@
 <p>In effect this adds <code>$abstract</code> as a key to the container with the value of <code>$concrete</code> and because <code>$shared</code> is set to true, the first time it&rsquo;s instantiated the object goes into <code>$app-&gt;instances</code> so that the next time <code>make</code> is called, the instance is used rather than being re-instantiated.</p>
 
 <p>If <code>$concrete</code> is a closure, it is evaluated lazily when the first instance is requested with <code>make</code> and then stored in <code>$app-&gt;instances</code> for future reference.</p>
+
+<div id="ioc-share"></div>
+
 
 <h3>share</h3>
 
@@ -202,6 +257,9 @@
 
 <p>Share doesn&rsquo;t store anything in the IoC container, and just returns a closure. Make sure you use it with another IoC feature (most people go for <code>$app['my.feature'] = $app-&gt;share(/* closure */)</code>).</p>
 
+<div id="ioc-extend"></div>
+
+
 <h3>extend</h3>
 
 <p><code>App::extend($abstract, $closure)</code></p>
@@ -209,6 +267,9 @@
 <p>Extend a binding with an outer wrapping closure. When the binding is resolved using <code>make</code>, the original closure is executed and then its result (the instance) is passed into the closure that was passed in here.</p>
 
 <p>Presumably this could be used for overriding dependency injection or setting additional dependencies using <code>$model-&gt;setInterface($concrete)</code> kinda thing.</p>
+
+<div id="ioc-instance"></div>
+
 
 <h3>instance</h3>
 
@@ -243,6 +304,11 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
+
+
+<div id="ioc-alias"></div>
+
+
 <h3>alias</h3>
 
 <p><code>App::alias($abstract, $alias)</code></p>
@@ -250,6 +316,9 @@
 <p>Allows you to alias a fully-qualified type to a shorter version. So you can alias <code>\My\Namespace\Is\Deep\MyClass</code> to <code>MyClass</code> by calling <code>App::alias('\My\Namespace\Is\Deep\MyClass', 'MyClass');</code> and then later you can just call <code>App::make('MyClass');</code></p>
 
 <p>This function does not actually store any bindings &ndash; just the fact that something called <code>$abstract</code> in the IoC container can be found by asking for <code>$alias</code>. It&rsquo;s also naïve in that you can pass anything in and it does no checking. Presumably the eventual call to <code>make</code> will do the checking that something <em>can</em> be resolved.</p>
+
+<div id="ioc-make"></div>
+
 
 <h3>make</h3>
 
@@ -271,6 +340,9 @@
 
 
 <p>This appears to be the backbone of the IoC – at a guess, whenever Laravel needs to resolve anything (through either an explicit call to <code>App::make()</code> or typehints) it&rsquo;ll use this. In turn, this uses the various registration methods outlined above.</p>
+
+<div id="urls"></div>
+
 
 <h2>URL Generation</h2>
 
@@ -350,6 +422,9 @@
 
 <p>Generates an HTML anchor linking to the action (see <code>URL::action()</code>)</p>
 
+<div id="service-providers"></div>
+
+
 <h2>Service Providers</h2>
 
 <p>The <code>register</code> method of a service provider is called first. This method should do very little – simply add any bindings to the IoC container. The reason being that all service providers will be initialised (using <code>register</code>) in order, so a given service provider cannot guarantee that a service provider it may rely on is initialised yet, and thus cannot use it.</p>
@@ -379,7 +454,13 @@
 
 <p>Also not discussed in the documentation is that a package&rsquo;s views can be overridden like its config can. To override the config, <code>artisan config:publish vendor/package</code> can be called, which under the hood copies the package&rsquo;s <code>&lt;package_root&gt;/config/*</code> files to <code>app/config/packages/&lt;vendor&gt;/&lt;package&gt;/*</code>. There is now (<a href="https://github.com/laravel/framework/pull/2364">all thanks to me</a>) also a corresponding <code>artisan</code> command for publishing views: just use <code>artisan view:publish vendor/package</code>. <strong>Do be careful with this though!</strong></p>
 
+<div id="eloquent"></div>
+
+
 <h2>Eloquent Models</h2>
+
+<div id="eloquent-relationships"></div>
+
 
 <h3>Relationships</h3>
 
@@ -527,6 +608,9 @@
 </ul>
 
 
+<div id="eloquent-fetching"></div>
+
+
 <h3>Fetching</h3>
 
 <p>Using Eloquent with <code>where</code>, <code>orWhere</code>, <code>take</code>, etc. uses the query builder. Once a query is complete and you need to get the actual collection of models the following methods are available:</p>
@@ -540,6 +624,9 @@
 <li><code>Model::distinct($field)-&gt;lists($field)</code> is a much more useful version of the above line &ndash; it&rsquo;ll strip duplicate field values and then return them in an array</li>
 <li><code>Model::toSql()</code> is useful for debugging &ndash; return the current query as an SQL string to be executed</li>
 </ul>
+
+
+<div id="eloquent-nested-wheres"></div>
 
 
 <h3>Nested Wheres</h3>
@@ -569,6 +656,11 @@
 </span><span class='line'>    <span class="nv">$query</span><span class="o">-&gt;</span><span class="p">(</span><span class="cm">/* y */</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="cm">/* z */</span><span class="p">);</span>
 </span><span class='line'><span class="p">});</span>
 </span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<div id="eloquent-boot"></div>
 
 
 <h3>Boot method</h3>
@@ -622,6 +714,11 @@
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<div id="routing"></div>
 
 
 <h2>Routing</h2>
@@ -681,6 +778,9 @@
 
 <p>  This method is only useful for setting up routing for an API really.</p></li>
 </ul>
+
+
+<div id="views"></div>
 
 
 <h2>The View class</h2>
