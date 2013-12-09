@@ -79,7 +79,7 @@ Route::group(
 <?php
 
 // get users 1 and 5
-$users = User::find([1, 5])->get();
+$users = User::find([1, 5]);
 ```
 
 - Can get current environment using `artisan env` (useful for debugging weird database connection issues with artisan - not so useful for knowing what environment the web site is running as artisan and the running web instance will use different methods to determine the environment, so they could quite easily be different) ([`5c7ba12`](https://github.com/laravel/framework/commit/5c7ba12fda225a295ae96dbb7770f4859aa65330))
