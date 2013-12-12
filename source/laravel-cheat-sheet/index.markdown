@@ -11,8 +11,9 @@ footer: true
 
 - [IoC Usage](#ioc)
     - [Bind](#ioc-bind)
-    - [Singleton](#ioc-singleton)
     - [Share](#ioc-share)
+    - [Bind Shared](#ioc-bind-shared)
+    - [Singleton](#ioc-singleton)
     - [Extend](#ioc-extend)
     - [Instance](#ioc-instance)
     - [Alias](#ioc-alias)
@@ -40,16 +41,20 @@ In general, where these methods take closures, the closure will act as they shou
     Adds `$abstract` as a key to the container, with `$concrete` being the concrete class to instantiate in its place.
     Mainly used for providing a concrete implementation for an interface.
 
-- `singleton($abstract, $concrete)`
-
-    Simply an alias to `make` with the `$shared` argument set to true.
-    Mainly used for providing a concrete implementation for an interface, but one that should only have one instance (database connection, etc.).
-
 - `share($closure)`
 
     Given a closure (only), makes it act as if it was shared (instance/singleton style), and returns it.
     Technically equivalent to `App::bind($key, $closure, true)` but goes about it a different way.
     Mainly used in service providers to add a fully resolvable service to the IoC container.
+
+- `bindShared($abstract, $closure)`
+
+    A shortcut that was introduced in 4.1 that caters to a common pattern. Essentially helps those who want to bind a shared instance in the container. See below for example.
+
+- `singleton($abstract, $concrete)`
+
+    Simply an alias to `make` with the `$shared` argument set to true.
+    Mainly used for providing a concrete implementation for an interface, but one that should only have one instance (database connection, etc.).
 
 - `extend($abstract, $closure)`
 
@@ -115,9 +120,16 @@ If `$concrete` is a closure, it is evaluated lazily when the first instance is r
 
 `App::share($closure)`
 
-It does this by wrapping it in a new closure that, the first time it runs, runs the closure and stores the result in a temporary variable. Every time it's called after that, it just returns the result.
+Wraps the passed closure in a new closure that, the first time it runs, runs the closure and stores the result in a temporary variable. Every time it's called after that, it just returns the result.
 
-Share doesn't store anything in the IoC container, and just returns a closure. Make sure you use it with another IoC feature (most people go for `$app['my.feature'] = $app->share(/* closure */)`).
+Share doesn't store anything in the IoC container, and just returns a closure. Make sure you use it with another IoC feature (most people go for `$app['my.feature'] = $app->share(/* closure */)`, but see below for new usage).
+
+<div id="ioc-bind-shared"></div>
+### bindShared
+
+`App::bindShared($abstract, $closure)`
+
+`bindShared` is a convenience method for the common pattern of `$app['my.feature'] = $app->share(/* closure */)`. The new method is `$app->bindShared('my.feature', /* closure */)`. It's a little shorter and arguably makes more sense when read, leading to more maintainable code.
 
 <div id="ioc-extend"></div>
 ### extend
