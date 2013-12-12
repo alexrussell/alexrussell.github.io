@@ -10,16 +10,16 @@
 
 	
 	<meta name="description" content="Contents IoC Usage Bind
-Singleton
 Share
+Bind Shared
+Singleton
 Extend
 Instance
 Alias
 Make URL Generation
 Service Providers
 Eloquent Relationships
-Fetching
-Nested Wheres &hellip;">
+Fetching &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -125,8 +125,9 @@ Nested Wheres &hellip;">
 
 <ul>
 <li><a href="#ioc-bind">Bind</a></li>
-<li><a href="#ioc-singleton">Singleton</a></li>
 <li><a href="#ioc-share">Share</a></li>
+<li><a href="#ioc-bind-shared">Bind Shared</a></li>
+<li><a href="#ioc-singleton">Singleton</a></li>
 <li><a href="#ioc-extend">Extend</a></li>
 <li><a href="#ioc-instance">Instance</a></li>
 <li><a href="#ioc-alias">Alias</a></li>
@@ -163,15 +164,18 @@ Nested Wheres &hellip;">
 
 <p>  Adds <code>$abstract</code> as a key to the container, with <code>$concrete</code> being the concrete class to instantiate in its place.
   Mainly used for providing a concrete implementation for an interface.</p></li>
-<li><p><code>singleton($abstract, $concrete)</code></p>
-
-<p>  Simply an alias to <code>make</code> with the <code>$shared</code> argument set to true.
-  Mainly used for providing a concrete implementation for an interface, but one that should only have one instance (database connection, etc.).</p></li>
 <li><p><code>share($closure)</code></p>
 
 <p>  Given a closure (only), makes it act as if it was shared (instance/singleton style), and returns it.
   Technically equivalent to <code>App::bind($key, $closure, true)</code> but goes about it a different way.
   Mainly used in service providers to add a fully resolvable service to the IoC container.</p></li>
+<li><p><code>bindShared($abstract, $closure)</code></p>
+
+<p>  A shortcut that was introduced in 4.1 that caters to a common pattern. Essentially helps those who want to bind a shared instance in the container. See below for example.</p></li>
+<li><p><code>singleton($abstract, $concrete)</code></p>
+
+<p>  Simply an alias to <code>make</code> with the <code>$shared</code> argument set to true.
+  Mainly used for providing a concrete implementation for an interface, but one that should only have one instance (database connection, etc.).</p></li>
 <li><p><code>extend($abstract, $closure)</code></p>
 
 <p>  Allows you to wrap an existing binding with another closure.</p></li>
@@ -253,9 +257,18 @@ Nested Wheres &hellip;">
 
 <p><code>App::share($closure)</code></p>
 
-<p>It does this by wrapping it in a new closure that, the first time it runs, runs the closure and stores the result in a temporary variable. Every time it&rsquo;s called after that, it just returns the result.</p>
+<p>Wraps the passed closure in a new closure that, the first time it runs, runs the closure and stores the result in a temporary variable. Every time it&rsquo;s called after that, it just returns the result.</p>
 
-<p>Share doesn&rsquo;t store anything in the IoC container, and just returns a closure. Make sure you use it with another IoC feature (most people go for <code>$app['my.feature'] = $app-&gt;share(/* closure */)</code>).</p>
+<p>Share doesn&rsquo;t store anything in the IoC container, and just returns a closure. Make sure you use it with another IoC feature (most people go for <code>$app['my.feature'] = $app-&gt;share(/* closure */)</code>, but see below for new usage).</p>
+
+<div id="ioc-bind-shared"></div>
+
+
+<h3>bindShared</h3>
+
+<p><code>App::bindShared($abstract, $closure)</code></p>
+
+<p><code>bindShared</code> is a convenience method for the common pattern of <code>$app['my.feature'] = $app-&gt;share(/* closure */)</code>. The new method is <code>$app-&gt;bindShared('my.feature', /* closure */)</code>. It&rsquo;s a little shorter and arguably makes more sense when read, leading to more maintainable code.</p>
 
 <div id="ioc-extend"></div>
 
