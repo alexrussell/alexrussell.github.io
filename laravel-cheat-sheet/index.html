@@ -194,8 +194,9 @@ Fetching &hellip;">
 <p>  While this is public, it appears that the general idea is not to call this. It is called internally by <code>make</code> to resolve a standard class&rsquo;s dependencies.</p></li>
 <li><p>array access</p>
 
-<p>  Upon getting, internally App::make is called on the key passed in.
-  Upon setting, internally App::bind is called, an the value passed in is converted to a closure if it is not already one</p></li>
+<p>  Upon getting, internally <code>App::make</code> is called on the key passed in.</p>
+
+<p>  Upon setting, internally <code>App::bind</code> is called, and the value passed in is converted to a closure if it is not already one.</p></li>
 </ul>
 
 
@@ -359,81 +360,66 @@ Fetching &hellip;">
 
 <h2>URL Generation</h2>
 
-<h3><code>URL::current()</code></h3>
+<ul>
+<li><p><code>URL::current()</code></p>
 
-<p>Returns the full URL of the current request, e.g. <code>http://localhost/path/to/page</code></p>
+<p>  Returns the full URL of the current request, e.g. <code>http://localhost/path/to/page</code></p></li>
+<li><p><code>URL::full()</code></p>
 
-<h3><code>URL::full()</code></h3>
+<p>  Returns the full URL of the current request with querystring appended, e.g. <code>http://localhost/path/to/page?foo=bar</code></p></li>
+<li><p><code>URL::previous()</code></p>
 
-<p>Returns the full URL of the current request with querystring appended, e.g. <code>http://localhost/path/to/page?foo=bar</code></p>
+<p>  Returns the full URL of the previous request (useful when redirecting maybe) &ndash; simply uses the value from the HTTP &lsquo;referer&rsquo; header, so <em>should</em> include the querystring</p></li>
+<li><p><code>URL::to($uri[, $parameters = array(), $secure = false])</code></p>
 
-<h3><code>URL::previous()</code></h3>
+<p>  Generates a full URL to the given URI path after the domain part. Does no checking of the validity of the URI passed.</p></li>
+<li><p><code>URL::secure($uri[, $parameters = array(), $secure = false])</code></p>
 
-<p>Returns the full URL of the previous request (useful when redirecting maybe) &ndash; simply uses the value from the HTTP &lsquo;referer&rsquo; header, so <em>should</em> include the querystring</p>
+<p>  Like <code>URL::to()</code> but generates HTTPS links</p></li>
+<li><p><code>URL::route($route_name[, $parameters = array(), $secure = false])</code></p>
 
-<h3><code>URL::to($uri[, $parameters = array(), $secure = false])</code></h3>
+<p>  Like <code>URL::to()</code> but pass in the name of a named route and it&rsquo;ll give the associated URI</p></li>
+<li><p><code>URL::action($action[, $parameters = array(), $secure = false])</code></p>
 
-<p>Generates a full URL to the given URI path after the domain part. Does no checking of the validity of the URI passed.</p>
+<p>  Like <code>URL::route()</code> but instead of passing in a named route, pass in a controller-action combination, e.g. <code>Controller@action</code></p></li>
+<li><p><code>URL::asset($uri[, $secure = false])</code></p>
 
-<h3><code>URL::secure($uri[, $parameters = array(), $secure = false])</code></h3>
+<p>  Looks like it works just like <code>URL::to()</code> in that is appends the passed URI to the full URL to the framework document root.</p></li>
+<li><p><code>URL::secureAsset($uri)</code></p>
 
-<p>Like <code>URL::to()</code> but generates HTTPS links</p>
+<p>  Like <code>URL::asset()</code> but generates HTTPS links</p></li>
+<li><p><code>url($uri[, $parameters = array(), $secure = false])</code></p>
 
-<h3><code>URL::route($route_name[, $parameters = array(), $secure = false])</code></h3>
+<p>  Alias of <code>URL::to()</code></p></li>
+<li><p><code>secure_url($uri[, $parameters = array(), $secure = false])</code></p>
 
-<p>Like <code>URL::to()</code> but pass in the name of a named route and it&rsquo;ll give the associated URI</p>
+<p>  Alias of <code>URL::secure()</code></p></li>
+<li><p><code>route($route_name[, $parameters = array(), $secure = false])</code></p>
 
-<h3><code>URL::action($action[, $parameters = array(), $secure = false])</code></h3>
+<p>  Alias of <code>URL::route()</code></p></li>
+<li><p><code>action($action[, $parameters = array(), $secure = false])</code></p>
 
-<p>Like <code>URL::route()</code> but instead of passing in a named route, pass in a controller-action combination, e.g. <code>Controller@action</code></p>
+<p>  Alias of <code>URL::action()</code></p></li>
+<li><p><code>asset($uri[, $secure=false])</code></p>
 
-<h3><code>URL::asset($uri[, $secure = false])</code></h3>
+<p>  Alias of <code>URL::asset()</code></p></li>
+<li><p><code>secure_asset($uri)</code></p>
 
-<p>Looks like it works just like <code>URL::to()</code> in that is appends the passed URI to the full URL to the framework document root.</p>
+<p>  Alias of <code>URL::secureAsset()</code></p></li>
+<li><p><code>link_to($uri, $title[, $attributes = array(), $secure = false])</code></p>
 
-<h3><code>URL::secureAsset($uri)</code></h3>
+<p>  Generates an HTML anchor tag to the given URI (see <code>URL::to()</code>)</p></li>
+<li><p><code>link_to_asset($uri, $title[, $attributes = array(), $secure = false])</code></p>
 
-<p>Like <code>URL::asset()</code> but generates HTTPS links</p>
+<p>  Generates an HTML anchor tag to the given asset URI (see <code>URL::asset()</code>)</p></li>
+<li><p><code>link_to_route($route_name, $title[, $parameters = array(), $attributes = array()])</code></p>
 
-<h3><code>url($uri[, $parameters = array(), $secure = false])</code></h3>
+<p>  Generates an HTML anchor linking to the named route (see <code>URL::route()</code>)</p></li>
+<li><p><code>link_to_action($action, $title[, $parameters = array(), $attributes = array()])</code></p>
 
-<p>Alias of <code>URL::to()</code></p>
+<p>  Generates an HTML anchor linking to the action (see <code>URL::action()</code>)</p></li>
+</ul>
 
-<h3><code>secure_url($uri[, $parameters = array(), $secure = false])</code></h3>
-
-<p>Alias of <code>URL::secure()</code></p>
-
-<h3><code>route($route_name[, $parameters = array(), $secure = false])</code></h3>
-
-<p>Alias of <code>URL::route()</code></p>
-
-<h3><code>action($action[, $parameters = array(), $secure = false])</code></h3>
-
-<p>Alias of <code>URL::action()</code></p>
-
-<h3><code>asset($uri[, $secure=false])</code></h3>
-
-<p>Alias of <code>URL::asset()</code></p>
-
-<h3><code>secure_asset($uri)</code></h3>
-
-<p>Alias of <code>URL::secureAsset()</code></p>
-
-<h3><code>link_to($uri, $title[, $attributes = array(), $secure = false])</code></h3>
-
-<p>Generates an HTML anchor tag to the given URI (see <code>URL::to()</code>)</p>
-
-<h3><code>link_to_asset($uri, $title[, $attributes = array(), $secure = false])</code></h3>
-
-<p>Generates an HTML anchor tag to the given asset URI (see <code>URL::asset()</code>)</p>
-
-<h3><code>link_to_route($route_name, $title[, $parameters = array(), $attributes = array()])</code></h3>
-
-<p>Generates an HTML anchor linking to the named route (see <code>URL::route()</code>)</p>
-
-<h3><code>link_to_action($action, $title[, $parameters = array(), $attributes = array()])</code></h3>
-
-<p>Generates an HTML anchor linking to the action (see <code>URL::action()</code>)</p>
 
 <div id="service-providers"></div>
 
@@ -449,7 +435,7 @@ Fetching &hellip;">
 <p>There are various parts of putting together a package and its (main) service provider that aren&rsquo;t discussed very well in the documentation:</p>
 
 <ul>
-<li><p><code>$this-&gt;package('vendor/package' [, $namespace = null, $path = null])</code></p>
+<li><p><code>$this-&gt;package('vendor/package'[, $namespace = null, $path = null])</code></p>
 
 <p>  This sets up a package so that Laravel knows where to look for the config, views, etc. In general, just passing the vendor/package name to the call to <code>package</code> will suffice, but if your paths are non-standard or you want to use a specific view/config namespace, you can set them up here.</p></li>
 <li><p><code>$this-&gt;commands(array)</code></p>
@@ -616,10 +602,7 @@ Fetching &hellip;">
 </span></code></pre></td></tr></table></div></figure>
 
 
-<ul>
-<li>Actually <code>attach</code> and <code>detach</code> can accept instances of <code>Eloquent\Model</code> but only if you&rsquo;re attaching or detaching one &ndash; they cannot be used if arrays are passed</li>
-</ul>
-
+<p>* Actually <code>attach</code> and <code>detach</code> can accept instances of <code>Eloquent\Model</code> but only if you&rsquo;re attaching or detaching one &ndash; they cannot be used if arrays are passed</p>
 
 <div id="eloquent-fetching"></div>
 
@@ -739,7 +722,7 @@ Fetching &hellip;">
 <p>Just some more detail on the less-discussed commands:</p>
 
 <ul>
-<li><p><code>Route::when($pattern, $names [, $methods = null])</code></p>
+<li><p><code>Route::when($pattern, $names[, $methods = null])</code></p>
 
 <p>  Register a filter or set of filters against a URI rather than route.</p>
 
