@@ -53,7 +53,7 @@ In general, where these methods take closures, the closure will act as they shou
 
 - `singleton($abstract, $concrete)`
 
-    Simply an alias to `make` with the `$shared` argument set to true.
+    Simply an alias to `bind` with the `$shared` argument set to true.
     Mainly used for providing a concrete implementation for an interface, but one that should only have one instance (database connection, etc.).
 
 - `extend($abstract, $closure)`
