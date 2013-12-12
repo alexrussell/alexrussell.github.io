@@ -79,8 +79,9 @@ In general, where these methods take closures, the closure will act as they shou
 
 - array access
 
-    Upon getting, internally App::make is called on the key passed in.
-    Upon setting, internally App::bind is called, an the value passed in is converted to a closure if it is not already one
+    Upon getting, internally `App::make` is called on the key passed in.
+
+    Upon setting, internally `App::bind` is called, and the value passed in is converted to a closure if it is not already one.
 
 <div id="ioc-bind"></div>
 ### bind
@@ -195,81 +196,81 @@ This appears to be the backbone of the IoC – at a guess, whenever Laravel need
 <div id="urls"></div>
 ## URL Generation
 
-### `URL::current()`
+- `URL::current()`
 
-Returns the full URL of the current request, e.g. `http://localhost/path/to/page`
+    Returns the full URL of the current request, e.g. `http://localhost/path/to/page`
 
-### `URL::full()`
+- `URL::full()`
 
-Returns the full URL of the current request with querystring appended, e.g. `http://localhost/path/to/page?foo=bar`
+    Returns the full URL of the current request with querystring appended, e.g. `http://localhost/path/to/page?foo=bar`
 
-### `URL::previous()`
+- `URL::previous()`
 
-Returns the full URL of the previous request (useful when redirecting maybe) - simply uses the value from the HTTP 'referer' header, so *should* include the querystring
+    Returns the full URL of the previous request (useful when redirecting maybe) - simply uses the value from the HTTP 'referer' header, so *should* include the querystring
 
-### `URL::to($uri[, $parameters = array(), $secure = false])`
+- `URL::to($uri[, $parameters = array(), $secure = false])`
 
-Generates a full URL to the given URI path after the domain part. Does no checking of the validity of the URI passed.
+    Generates a full URL to the given URI path after the domain part. Does no checking of the validity of the URI passed.
 
-### `URL::secure($uri[, $parameters = array(), $secure = false])`
+- `URL::secure($uri[, $parameters = array(), $secure = false])`
 
-Like `URL::to()` but generates HTTPS links
+    Like `URL::to()` but generates HTTPS links
 
-### `URL::route($route_name[, $parameters = array(), $secure = false])`
+- `URL::route($route_name[, $parameters = array(), $secure = false])`
 
-Like `URL::to()` but pass in the name of a named route and it'll give the associated URI
+    Like `URL::to()` but pass in the name of a named route and it'll give the associated URI
 
-### `URL::action($action[, $parameters = array(), $secure = false])`
+- `URL::action($action[, $parameters = array(), $secure = false])`
 
-Like `URL::route()` but instead of passing in a named route, pass in a controller-action combination, e.g. `Controller@action`
+    Like `URL::route()` but instead of passing in a named route, pass in a controller-action combination, e.g. `Controller@action`
 
-### `URL::asset($uri[, $secure = false])`
+- `URL::asset($uri[, $secure = false])`
 
-Looks like it works just like `URL::to()` in that is appends the passed URI to the full URL to the framework document root.
+    Looks like it works just like `URL::to()` in that is appends the passed URI to the full URL to the framework document root.
 
-### `URL::secureAsset($uri)`
+- `URL::secureAsset($uri)`
 
-Like `URL::asset()` but generates HTTPS links
+    Like `URL::asset()` but generates HTTPS links
 
-### `url($uri[, $parameters = array(), $secure = false])`
+- `url($uri[, $parameters = array(), $secure = false])`
 
-Alias of `URL::to()`
+    Alias of `URL::to()`
 
-### `secure_url($uri[, $parameters = array(), $secure = false])`
+- `secure_url($uri[, $parameters = array(), $secure = false])`
 
-Alias of `URL::secure()`
+    Alias of `URL::secure()`
 
-### `route($route_name[, $parameters = array(), $secure = false])`
+- `route($route_name[, $parameters = array(), $secure = false])`
 
-Alias of `URL::route()`
+    Alias of `URL::route()`
 
-### `action($action[, $parameters = array(), $secure = false])`
+- `action($action[, $parameters = array(), $secure = false])`
 
-Alias of `URL::action()`
+    Alias of `URL::action()`
 
-### `asset($uri[, $secure=false])`
+- `asset($uri[, $secure=false])`
 
-Alias of `URL::asset()`
+    Alias of `URL::asset()`
 
-### `secure_asset($uri)`
+- `secure_asset($uri)`
 
-Alias of `URL::secureAsset()`
+    Alias of `URL::secureAsset()`
 
-### `link_to($uri, $title[, $attributes = array(), $secure = false])`
+- `link_to($uri, $title[, $attributes = array(), $secure = false])`
 
-Generates an HTML anchor tag to the given URI (see `URL::to()`)
+    Generates an HTML anchor tag to the given URI (see `URL::to()`)
 
-### `link_to_asset($uri, $title[, $attributes = array(), $secure = false])`
+- `link_to_asset($uri, $title[, $attributes = array(), $secure = false])`
 
-Generates an HTML anchor tag to the given asset URI (see `URL::asset()`)
+    Generates an HTML anchor tag to the given asset URI (see `URL::asset()`)
 
-### `link_to_route($route_name, $title[, $parameters = array(), $attributes = array()])`
+- `link_to_route($route_name, $title[, $parameters = array(), $attributes = array()])`
 
-Generates an HTML anchor linking to the named route (see `URL::route()`)
+    Generates an HTML anchor linking to the named route (see `URL::route()`)
 
-### `link_to_action($action, $title[, $parameters = array(), $attributes = array()])`
+- `link_to_action($action, $title[, $parameters = array(), $attributes = array()])`
 
-Generates an HTML anchor linking to the action (see `URL::action()`)
+    Generates an HTML anchor linking to the action (see `URL::action()`)
 
 <div id="service-providers"></div>
 ## Service Providers
@@ -282,7 +283,7 @@ The next method that's called is `boot`. By the time this method fires, all of t
 
 There are various parts of putting together a package and its (main) service provider that aren't discussed very well in the documentation:
 
-- `$this->package('vendor/package' [, $namespace = null, $path = null])`
+- `$this->package('vendor/package'[, $namespace = null, $path = null])`
 
     This sets up a package so that Laravel knows where to look for the config, views, etc. In general, just passing the vendor/package name to the call to `package` will suffice, but if your paths are non-standard or you want to use a specific view/config namespace, you can set them up here.
 
@@ -463,7 +464,7 @@ class Post extends Eloquent
 
 Just some more detail on the less-discussed commands:
 
-- `Route::when($pattern, $names [, $methods = null])`
+- `Route::when($pattern, $names[, $methods = null])`
 
     Register a filter or set of filters against a URI rather than route.
 
