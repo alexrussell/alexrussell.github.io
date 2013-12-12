@@ -174,7 +174,7 @@ Fetching &hellip;">
 <p>  A shortcut that was introduced in 4.1 that caters to a common pattern. Essentially helps those who want to bind a shared instance in the container. See below for example.</p></li>
 <li><p><code>singleton($abstract, $concrete)</code></p>
 
-<p>  Simply an alias to <code>make</code> with the <code>$shared</code> argument set to true.
+<p>  Simply an alias to <code>bind</code> with the <code>$shared</code> argument set to true.
   Mainly used for providing a concrete implementation for an interface, but one that should only have one instance (database connection, etc.).</p></li>
 <li><p><code>extend($abstract, $closure)</code></p>
 
