@@ -392,7 +392,7 @@ $post->tags()->sync([$tag->id, $other_tag->id]);
 $post->tags()->detach();
 ```
 
-* Actually `attach` and `detach` can accept instances of `Eloquent\Model` but only if you're attaching or detaching one - they cannot be used if arrays are passed
+\* Actually `attach` and `detach` can accept instances of `Eloquent\Model` but only if you're attaching or detaching one - they cannot be used if arrays are passed
 
 <div id="eloquent-fetching"></div>
 ### Fetching
