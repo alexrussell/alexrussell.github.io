@@ -4,7 +4,7 @@
   <title><![CDATA[Alex's Blog]]></title>
   <link href="http://alexrussell.me.uk/atom.xml" rel="self"/>
   <link href="http://alexrussell.me.uk/"/>
-  <updated>2013-12-12T09:45:25+00:00</updated>
+  <updated>2013-12-16T11:54:05+00:00</updated>
   <id>http://alexrussell.me.uk/</id>
   <author>
     <name><![CDATA[Alex Russell]]></name>
@@ -12,6 +12,72 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Laravel Digest (December 2013)]]></title>
+    <link href="http://alexrussell.me.uk/blog/2013/12/laravel-digest-december-2013/"/>
+    <updated>2013-12-15T10:00:00+00:00</updated>
+    <id>http://alexrussell.me.uk/blog/2013/12/laravel-digest-december-2013</id>
+    <content type="html"><![CDATA[<p>Welcome to the fourth instalment of Laravel Digest, the series where I give a regular rundown of important changes, fixes and additions to Laravel&rsquo;s master branch. Due to the release of Laravel 4.1 I&rsquo;ve decided to bring this post forward to match the status of Laravel on the day(ish) of release. As such, below are the changes up to the middle of December 2013:</p>
+
+<ul>
+<li><code>Collection#first</code> can now have a closure (and default) passed to it that will be passed into a <code>array_first</code>-like call (<a href="https://github.com/laravel/framework/commit/d600ebe7c2e76ca98c5ed280d77107a4159acfc4"><code>d600ebe</code></a>):</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// get all users</span>
+</span><span class='line'><span class="nv">$users</span> <span class="o">=</span> <span class="nx">User</span><span class="o">::</span><span class="na">all</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// get first that is enabled or string &#39;None&#39; if none match</span>
+</span><span class='line'><span class="nv">$firstEnabled</span> <span class="o">=</span> <span class="nv">$users</span><span class="o">-&gt;</span><span class="na">first</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="nv">$model</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$model</span><span class="o">-&gt;</span><span class="na">enabled</span> <span class="o">==</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'><span class="p">},</span> <span class="s1">&#39;None&#39;</span><span class="p">);</span> <span class="c1">// obviously an awful example in terms of what it returns</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><p>New <code>array_last</code> helper (side-effect of some other work which was reverted) that works the same as array_first (<a href="https://github.com/laravel/framework/commit/88421ddc6b2313ec16cd65b66a03ee8258e02702"><code>88421dd</code></a>)</p></li>
+<li><p><code>Collection#sortBy</code> now takes <a href="http://www.php.net/manual/en/function.sort.php">sort flags</a> as its second parameter (<a href="https://github.com/laravel/framework/commit/426c9e0e39915eedd2861b147ba6701443136e3d"><code>426c9e0</code></a>)</p></li>
+<li><p>You can now retrieve failed recipients to <code>Mail::send()</code> with <code>Mail::failures()</code> (<a href="https://github.com/laravel/framework/commit/a0086a5779c21a06def56d9cff9bb51a3ed3f242">a0086a5</a>)</p></li>
+<li><p><code>Model::destroy()</code> now returns the number of rows that were deleted (<a href="https://github.com/laravel/framework/commit/0f1a3cce2c08cee6fcea5fd754efe54b1130f4db"><code>0f1a3cc</code></a>)</p></li>
+<li><p>There&rsquo;s also a bunch of new documentation for all the new features I&rsquo;ve spoken about:</p>
+
+<ul>
+<li><a href="http://laravel.com/docs/upgrade">Upgrade guide</a></li>
+<li><a href="http://laravel.com/docs/security#password-reminders-and-reset">New password reminder system</a></li>
+<li><a href="http://laravel.com/docs/cache#cache-tags">Cache tags</a></li>
+<li>Queues had a number of changes, the most important being logging of failed jobs. So <a href="http://laravel.com/docs/queues#failed-jobs">its documentation</a> should be looked over.</li>
+<li>A <a href="http://laravel.com/docs/ssh">new SSH module</a> was incorporated primarily for interacting with a live environment (for example, deployment or tailing remote logs).</li>
+<li><a href="http://laravel.com/docs/templates#other-blade-control-structures">New Blade features</a></li>
+<li><code>Validator#sometimes()</code> <a href="http://laravel.com/docs/validation#conditionally-adding-rules">documentation</a></li>
+<li>Database <a href="http://laravel.com/docs/database#read-write-connections">read/write connection splitting</a></li>
+<li>Database query builder got <a href="http://laravel.com/docs/queries">some extra methods as pessimistic locking</a>.</li>
+<li>Eloquent relationships had a few updates too:
+
+<ul>
+<li><a href="http://laravel.com/docs/eloquent#has-many-through">hasManyThrough</a></li>
+<li><a href="https://github.com/laravel/docs/pull/547">Polymorphic many-to-many()</a> (not yet in official documentation)</li>
+<li><a href="http://laravel.com/docs/eloquent#querying-relations">Model::has() and Model:whereHas()</a></li>
+<li><a href="http://laravel.com/docs/eloquent#eager-loading">Eager loading constraints</a> (scroll down a little)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Laravel Digest (November 2013)]]></title>
